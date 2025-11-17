@@ -1,0 +1,6 @@
+Conversation:
+"""
+${conversation}
+"""
+
+Summarize the above conversation in a short sentence of no more than 100 words:

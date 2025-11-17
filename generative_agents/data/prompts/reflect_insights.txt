@@ -1,0 +1,8 @@
+Reference information:
+"""
+${reference}
+"""
+
+From the above reference information, summarize ${number} high-level insights and indicate the reference information numbers related to these insights. Each insight should not exceed 50 words, and each line contains only one insight and one set of reference information numbers.
+Output format:
+1. <insight> (Reference numbers 2,3,5)

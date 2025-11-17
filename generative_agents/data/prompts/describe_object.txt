@@ -1,0 +1,23 @@
+Task: Describe the state of an object near someone in a short sentence of no more than 10 words.
+
+Examples:
+
+Think step by step about the state of <oven>:
+Step 1. Sam is eating breakfast next to <oven>.
+Step 2. Describe the state of <oven>.
+Output: <oven> is heating up to cook breakfast
+
+Think step by step about the state of <computer>:
+Step 1. Mike is writing an email using <computer>.
+Step 2. Describe the state of <computer>.
+Output: <computer> is being used to write an email
+
+Think step by step about the state of <sink>:
+Step 1. Tom is washing his face using <sink>.
+Step 2. Describe the state of <sink>.
+Output: <sink> is filling with water
+
+Based on the above examples, think step by step about the state of <${object}>:
+Step 1. ${agent} is ${action}, and <${object}> is nearby
+Step 2. Describe the state of <${object}>.
+Output:

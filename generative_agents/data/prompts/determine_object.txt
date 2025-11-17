@@ -1,0 +1,10 @@
+From the option list, select the most relevant object for the current activity.
+
+Current activity: ${activity}
+
+Requirements:
+1. Must select an object from this list: [${objects}].
+2. Do not select objects outside the list.
+3. Directly output the selected result.
+
+The most relevant object for the current activity is:

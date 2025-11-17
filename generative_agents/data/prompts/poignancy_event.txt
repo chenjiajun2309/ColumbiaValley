@@ -1,0 +1,19 @@
+${base_desc}
+
+Rate on a scale of 1 to 10, rating principles:
+1 represents extremely ordinary, such as brushing teeth, making the bed, and other common events;
+10 represents extremely special or intense, memorable, such as breakups, college admissions, and other special events.
+Each event can only be represented by an integer from 1 to 10. For example:
+Event: Brushing teeth. Rating: 1
+Event: Making the bed. Rating: 1
+Event: Breakup. Rating: 10
+Event: College admission. Rating: 10
+
+Here is a complete event that ${agent} needs to rate:
+"""
+${event}
+"""
+Rating: <score>
+
+Fill in <score> based on the complete event.
+Format requirement: Output only 1 number in the range of 1 to 10, do not output any content other than the number.

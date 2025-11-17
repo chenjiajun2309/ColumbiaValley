@@ -1,0 +1,24 @@
+Here is a brief description of ${agent}:
+${base_desc}
+
+Here are ${agent}'s memories:
+${memory}
+
+Current location: ${address}
+Current time: ${current_time}
+
+${previous_context}${current_context}
+${agent} starts a conversation with ${another}. Here is their conversation record:
+<Conversation Record>
+${conversation}
+</Conversation Record>
+
+<Conversation Principles>
+${agent} will not repeat content already present in <Conversation Record>
+</Conversation Principles>
+
+Based on the above <Conversation Record> and <Conversation Principles>, what will ${agent} say to ${another} now?
+Directly output the following JSON format, do not add any other information:
+{
+    "${agent}": <what ${agent} says>
+}

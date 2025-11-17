@@ -1,0 +1,11 @@
+Background:
+"""
+${context}
+
+Now is ${date}. ${chat_history}
+
+${agent_status}
+${another_status}
+"""
+
+Based on the above background, determine whether ${agent} is likely to initiate a conversation with ${another}? Answer only "Yes" or "No":

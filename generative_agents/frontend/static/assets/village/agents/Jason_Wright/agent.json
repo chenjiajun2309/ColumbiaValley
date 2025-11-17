@@ -1,0 +1,139 @@
+{
+  "name": "Jason_Wright",
+  "portrait": "assets/village/agents/Jason_Wright/portrait.png",
+  "coord": [
+    50,
+    56
+  ],
+  "currently": "Jason is patrolling the campus plaza and assisting lost visitors.",
+  "scratch": {
+    "age": 35,
+    "innate": "alert, fair, composed",
+    "learned": "patrol routines, emergency response, first aid",
+    "lifestyle": "rotating shifts; peak patrol in evenings",
+    "daily_plan": ""
+  },
+  "spatial": {
+    "address": {
+      "living_area": [
+        "Columbia Campus",
+        "Security Office",
+        "Briefing Room"
+      ]
+    },
+    "tree": {
+      "Columbia Campus": {
+        "Low Library": {
+          "Office": [
+            "desk",
+            "meeting table",
+            "bookshelf"
+          ],
+          "Lobby": [
+            "info desk",
+            "map"
+          ]
+        },
+        "Butler Library": {
+          "Reading Room": [
+            "tables",
+            "stacks",
+            "circulation desk"
+          ],
+          "Reference Desk": [
+            "counter",
+            "computer"
+          ]
+        },
+        "Mudd Hall": {
+          "CS Lab": [
+            "workstations",
+            "whiteboard",
+            "servers"
+          ],
+          "Office": [
+            "desk",
+            "bookshelf"
+          ]
+        },
+        "Schermerhorn Hall": {
+          "GIS Lab": [
+            "workstations",
+            "maps"
+          ],
+          "Classroom": [
+            "podium",
+            "seats"
+          ]
+        },
+        "Math Building": {
+          "Classroom 3": [
+            "blackboard",
+            "desks"
+          ]
+        },
+        "Humanities Hall": {
+          "Seminar Room": [
+            "circle chairs",
+            "projector"
+          ]
+        },
+        "Lerner Hall": {
+          "Student Center": [
+            "lobby",
+            "auditorium"
+          ]
+        },
+        "Residence Halls": {
+          "Dorm A": [
+            "rooms",
+            "common area"
+          ],
+          "Dorm B": [
+            "rooms",
+            "laundry"
+          ]
+        },
+        "Cafeteria": {
+          "Kitchen": [
+            "stoves",
+            "prep tables"
+          ],
+          "Serving Line": [
+            "counter",
+            "trays"
+          ]
+        },
+        "Security Office": {
+          "Briefing Room": [
+            "desk",
+            "radio",
+            "logbook"
+          ],
+          "Locker Room": [
+            "uniform rack",
+            "storage"
+          ]
+        },
+        "Facilities": {
+          "Workshop": [
+            "tools",
+            "storage"
+          ]
+        },
+        "Journalism School": {
+          "Newsroom": [
+            "desks",
+            "studio"
+          ]
+        },
+        "Campus Plaza": {
+          "Plaza": [
+            "benches",
+            "fountain"
+          ]
+        }
+      }
+    }
+  }
+}

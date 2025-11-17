@@ -1,0 +1,10 @@
+Example 1:
+${examples_1}
+
+Example 2:
+${examples_2}
+
+Based on the above examples, answer which option is most suitable for the following task:
+${task}
+
+Do not output the reasoning process, directly output the answer:

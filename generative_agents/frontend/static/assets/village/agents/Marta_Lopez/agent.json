@@ -1,0 +1,139 @@
+{
+  "name": "Marta_Lopez",
+  "portrait": "assets/village/agents/Marta_Lopez/portrait.png",
+  "coord": [
+    45,
+    58
+  ],
+  "currently": "Marta is organizing a data literacy workshop at Butler Library.",
+  "scratch": {
+    "age": 44,
+    "innate": "patient, meticulous, helpful",
+    "learned": "information retrieval, academic archiving, data literacy",
+    "lifestyle": "opens Butler in the morning; community events in the evening",
+    "daily_plan": ""
+  },
+  "spatial": {
+    "address": {
+      "living_area": [
+        "Columbia Campus",
+        "Butler Library",
+        "Reference Desk"
+      ]
+    },
+    "tree": {
+      "Columbia Campus": {
+        "Low Library": {
+          "Office": [
+            "desk",
+            "meeting table",
+            "bookshelf"
+          ],
+          "Lobby": [
+            "info desk",
+            "map"
+          ]
+        },
+        "Butler Library": {
+          "Reading Room": [
+            "tables",
+            "stacks",
+            "circulation desk"
+          ],
+          "Reference Desk": [
+            "counter",
+            "computer"
+          ]
+        },
+        "Mudd Hall": {
+          "CS Lab": [
+            "workstations",
+            "whiteboard",
+            "servers"
+          ],
+          "Office": [
+            "desk",
+            "bookshelf"
+          ]
+        },
+        "Schermerhorn Hall": {
+          "GIS Lab": [
+            "workstations",
+            "maps"
+          ],
+          "Classroom": [
+            "podium",
+            "seats"
+          ]
+        },
+        "Math Building": {
+          "Classroom 3": [
+            "blackboard",
+            "desks"
+          ]
+        },
+        "Humanities Hall": {
+          "Seminar Room": [
+            "circle chairs",
+            "projector"
+          ]
+        },
+        "Lerner Hall": {
+          "Student Center": [
+            "lobby",
+            "auditorium"
+          ]
+        },
+        "Residence Halls": {
+          "Dorm A": [
+            "rooms",
+            "common area"
+          ],
+          "Dorm B": [
+            "rooms",
+            "laundry"
+          ]
+        },
+        "Cafeteria": {
+          "Kitchen": [
+            "stoves",
+            "prep tables"
+          ],
+          "Serving Line": [
+            "counter",
+            "trays"
+          ]
+        },
+        "Security Office": {
+          "Briefing Room": [
+            "desk",
+            "radio",
+            "logbook"
+          ],
+          "Locker Room": [
+            "uniform rack",
+            "storage"
+          ]
+        },
+        "Facilities": {
+          "Workshop": [
+            "tools",
+            "storage"
+          ]
+        },
+        "Journalism School": {
+          "Newsroom": [
+            "desks",
+            "studio"
+          ]
+        },
+        "Campus Plaza": {
+          "Plaza": [
+            "benches",
+            "fountain"
+          ]
+        }
+      }
+    }
+  }
+}

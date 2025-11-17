@@ -1,0 +1,10 @@
+${base_desc}
+
+Here is the hourly breakdown of ${agent}'s schedule today:
+${daily_schedule}
+
+Please refer to the above character information and schedule breakdown to generate an hourly plan (24-hour format), only fill in the <activity> content, do not skip any time point.
+The hourly plan must follow the format below:
+"""
+${hourly_schedule}
+"""

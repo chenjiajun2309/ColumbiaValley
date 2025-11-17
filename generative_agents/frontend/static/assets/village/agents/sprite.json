@@ -1,0 +1,59 @@
+{
+  "framesPerDir": 3,
+  "dirs": [
+    "down",
+    "left",
+    "right",
+    "up"
+  ],
+  "agents": [
+    {
+      "name": "Evelyn_Park",
+      "texture": "assets/village/agents/Evelyn_Park/texture.png"
+    },
+    {
+      "name": "Marta_Lopez",
+      "texture": "assets/village/agents/Marta_Lopez/texture.png"
+    },
+    {
+      "name": "Daniel_Kim",
+      "texture": "assets/village/agents/Daniel_Kim/texture.png"
+    },
+    {
+      "name": "Priya_Nair",
+      "texture": "assets/village/agents/Priya_Nair/texture.png"
+    },
+    {
+      "name": "Liam_OConnor",
+      "texture": "assets/village/agents/Liam_OConnor/texture.png"
+    },
+    {
+      "name": "Grace_Chen",
+      "texture": "assets/village/agents/Grace_Chen/texture.png"
+    },
+    {
+      "name": "Noah_Patel",
+      "texture": "assets/village/agents/Noah_Patel/texture.png"
+    },
+    {
+      "name": "Jason_Wright",
+      "texture": "assets/village/agents/Jason_Wright/texture.png"
+    },
+    {
+      "name": "Rosa_Martinez",
+      "texture": "assets/village/agents/Rosa_Martinez/texture.png"
+    },
+    {
+      "name": "Ava_Lee",
+      "texture": "assets/village/agents/Ava_Lee/texture.png"
+    },
+    {
+      "name": "Benjamin_Carter",
+      "texture": "assets/village/agents/Benjamin_Carter/texture.png"
+    },
+    {
+      "name": "Sophia_Rossi",
+      "texture": "assets/village/agents/Sophia_Rossi/texture.png"
+    }
+  ]
+}

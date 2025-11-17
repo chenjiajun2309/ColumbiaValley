@@ -1,0 +1,12 @@
+<Conversation Record>
+${conversation}
+</Conversation Record>
+
+<Judgment Logic>
+If the last sentence is a question, it indicates the conversation has not ended.
+If the last sentence is requesting help from the other party, it indicates the conversation has not ended.
+If the last sentence is asking for the other party's opinion, it indicates the conversation has not ended.
+If the last sentence expresses anticipation to continue discussing with the other party, it indicates the conversation has not ended.
+</Judgment Logic>
+
+Based on the above <Conversation Record> and <Judgment Logic>, analyze whether the conversation between ${agent} and ${another} has come to an end. Answer only "Yes" or "No":

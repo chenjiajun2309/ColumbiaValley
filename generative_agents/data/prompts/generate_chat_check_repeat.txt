@@ -1,0 +1,9 @@
+<Conversation Record>
+${conversation}
+</Conversation Record>
+
+<New Conversation>
+${content}
+</New Conversation>
+
+Has the content ${agent} said in <New Conversation> appeared in <Conversation Record>? Answer only "Yes" or "No":

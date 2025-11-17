@@ -1,0 +1,7 @@
+Reference information:
+"""
+${reference}
+"""
+
+Based on the above reference information, propose ${number} high-quality advanced questions. Each line contains only one number and one question.
+Format: 1. <question>

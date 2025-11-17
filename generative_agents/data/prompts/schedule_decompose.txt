@@ -1,0 +1,32 @@
+Describe subtasks in 5-minute increments.
+
+Example:
+"""
+Name: Kelly
+Age: 35 years old
+Daily plan: Kelly plans to teach classes in the morning and work at home in the afternoon
+
+Kelly is a kindergarten teacher. She creates lesson plans at home. She currently lives alone in a one-bedroom apartment.
+
+Kelly's plan is: 08:00 to 09:00, Kelly plans to eat breakfast; 09:00 to 10:00, Kelly plans to create kindergarten lesson plans for the next day.
+
+List all subtasks for Kelly from 9:00 to 10:00 in 5-minute increments (total duration: 60 minutes):
+<Subtasks>
+1) Kelly *plans* to review kindergarten curriculum standards (time: 15, remaining: 45)
+2) Kelly *plans* to brainstorm for this lesson (time: 10, remaining: 35)
+3) Kelly *plans* to create lesson plan (time: 20, remaining: 15)
+4) Kelly *plans* to print lesson plan (time: 10, remaining: 5)
+5) Kelly *plans* to put lesson plan in bag (time: 5, remaining: 0)
+"""
+
+Refer to the example and list subtasks for the following plan.
+"""
+${base_desc}
+${agent}'s current plan is: ${plan}
+"""
+
+The total number of subtasks should not exceed 10, each subtask takes one line, in the following format:
+1) ${agent} *plans* <activity> (time: <duration>, remaining: <duration>)
+
+List all subtasks for ${agent} from ${start} to ${end} in ${increment}-minute increments (total duration: 60 minutes):
+<Subtasks>

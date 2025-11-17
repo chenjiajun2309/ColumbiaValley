@@ -1,0 +1,6 @@
+Conversation record:
+"""
+${conversation}
+"""
+
+Based on the above conversation record, from ${agent}'s perspective, describe in one sentence whether ${agent} needs to remember their plan.

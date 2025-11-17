@@ -1,0 +1,15 @@
+From the area options, select an appropriate area for the current task.
+
+${agent} lives in <${live_sector}>, which contains ${live_arenas}.
+${agent}'s current location is <${current_sector}>, which contains ${current_arenas}.
+${daily_plan}
+Question:
+${agent} is ${complete_plan}. To ${decomposed_plan}, where should ${agent} go?
+
+Requirements:
+1. Must select an area from this list: [${areas}].
+2. If currently located in an area from the list and the planned activity can be performed there, it's best to stay in the current area.
+3. Do not select areas outside the list.
+4. Directly output the selected result.
+
+${agent} should go to:

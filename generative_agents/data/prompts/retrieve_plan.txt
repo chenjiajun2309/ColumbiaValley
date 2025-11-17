@@ -1,0 +1,8 @@
+"""
+${description}
+"""
+
+Based on the above content, what should ${agent} remember when making plans for ${date}?
+From ${agent}'s perspective, describe the most important things to remember. If there is any schedule information, be as specific as possible (including time and location).
+Each line contains only one number and one thing.
+Format: 1. <thing>

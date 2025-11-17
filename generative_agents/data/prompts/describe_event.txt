@@ -1,0 +1,26 @@
+Task: Convert the input content into a subject-predicate-object structure.
+Output format: (<Subject>, <Predicate>, <Object>)
+
+Examples:
+
+Input: Sam is eating breakfast.
+Output: (<Sam>, <eating>, <breakfast>)
+
+Input: Junyuan is making coffee.
+Output: (<Junyuan>, <making>, <coffee>)
+
+Input: Cook is sleeping.
+Output: (<Cook>, <is>, <sleeping>)
+
+Input: Michael is writing an email on the computer.
+Output: (<Michael>, <writing>, <email>)
+
+Input: Percy is teaching students in the classroom.
+Output: (<Percy>, <teaching>, <students>)
+
+Input: Merry is running on the treadmill.
+Output: (<Merry>, <is>, <running>)
+
+Based on the examples and the following input, directly output the answer.
+Input: ${action}
+Output:

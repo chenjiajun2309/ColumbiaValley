@@ -1,0 +1,8 @@
+Name: ${name}
+Age: ${age}
+Innate traits: ${innate}
+Learned traits: ${learned}
+Lifestyle: ${lifestyle}
+Daily plan: ${daily_plan}
+
+Today is ${date}. ${currently}

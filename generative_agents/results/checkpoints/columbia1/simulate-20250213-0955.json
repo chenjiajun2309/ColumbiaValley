@@ -1,0 +1,3425 @@
+{
+  "stride": 5,
+  "time": "20250213-09:55",
+  "maze": {
+    "path": "assets/village/maze.json"
+  },
+  "agent_base": {
+    "percept": {
+      "mode": "box",
+      "vision_r": 8,
+      "att_bandwidth": 8
+    },
+    "schedule": {
+      "max_try": 5,
+      "diversity": 5
+    },
+    "think": {
+      "llm": {
+        "provider": "ollama",
+        "model": "qwen2.5:7b-instruct-q4_K_M",
+        "base_url": "http://127.0.0.1:11434/v1",
+        "api_key": ""
+      },
+      "interval": 1000,
+      "poignancy_max": 150
+    },
+    "chat_iter": 4,
+    "associate": {
+      "embedding": {
+        "provider": "ollama",
+        "model": "bge-m3:latest",
+        "base_url": "http://127.0.0.1:11434",
+        "api_key": ""
+      },
+      "retention": 8
+    }
+  },
+  "agents": {
+    "Ava_Lee": {
+      "config_path": "assets/village/agents/Ava_Lee/agent.json",
+      "status": {
+        "poignancy": 24
+      },
+      "schedule": {
+        "create": "20250213-09:30:00",
+        "daily_schedule": [
+          {
+            "idx": 0,
+            "describe": "sleeping",
+            "start": 0,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 1,
+            "describe": "sleeping",
+            "start": 60,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 2,
+            "describe": "sleeping",
+            "start": 120,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 3,
+            "describe": "sleeping",
+            "start": 180,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 4,
+            "describe": "sleeping",
+            "start": 240,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 5,
+            "describe": "sleeping",
+            "start": 300,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 6,
+            "describe": "sleeping",
+            "start": 360,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 7,
+            "describe": "waking up",
+            "start": 420,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 8,
+            "describe": "having breakfast",
+            "start": 480,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 9,
+            "describe": "debugging web app with group",
+            "start": 540,
+            "duration": 60,
+            "decompose": [
+              {
+                "idx": 0,
+                "describe": "to review the current state of the web app ",
+                "start": 540,
+                "duration": 10
+              },
+              {
+                "idx": 1,
+                "describe": "to identify and discuss bugs with group members ",
+                "start": 550,
+                "duration": 10
+              },
+              {
+                "idx": 2,
+                "describe": "to work on fixing a specific bug identified in the previous step ",
+                "start": 560,
+                "duration": 15
+              },
+              {
+                "idx": 3,
+                "describe": "to test the fixed bug and ensure it is resolved ",
+                "start": 575,
+                "duration": 10
+              },
+              {
+                "idx": 4,
+                "describe": "to document the changes made for future reference ",
+                "start": 585,
+                "duration": 5
+              },
+              {
+                "idx": 5,
+                "describe": "to review documentation with group members ",
+                "start": 590,
+                "duration": 5
+              },
+              {
+                "idx": 6,
+                "describe": "to discuss next steps and tasks for the project ",
+                "start": 595,
+                "duration": 5
+              }
+            ]
+          },
+          {
+            "idx": 10,
+            "describe": "debugging web app with group",
+            "start": 600,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 11,
+            "describe": "debugging web app with group",
+            "start": 660,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 12,
+            "describe": "taking a short break",
+            "start": 720,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 13,
+            "describe": "continuing debugging and coding",
+            "start": 780,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 14,
+            "describe": "continuing debugging and coding",
+            "start": 840,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 15,
+            "describe": "having lunch",
+            "start": 900,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 16,
+            "describe": "resuming debugging with group",
+            "start": 960,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 17,
+            "describe": "resuming debugging with group",
+            "start": 1020,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 18,
+            "describe": "resuming debugging with group",
+            "start": 1080,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 19,
+            "describe": "participating in afternoon group study session",
+            "start": 1140,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 20,
+            "describe": "participating in afternoon group study session",
+            "start": 1200,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 21,
+            "describe": "participating in afternoon group study session",
+            "start": 1260,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 22,
+            "describe": "participating in afternoon group study session",
+            "start": 1320,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 23,
+            "describe": "sleeping",
+            "start": 1380,
+            "duration": 60,
+            "decompose": {}
+          }
+        ]
+      },
+      "associate": {
+        "memory": {
+          "event": [
+            "node_4",
+            "node_3",
+            "node_2",
+            "node_1"
+          ],
+          "thought": [
+            "node_0"
+          ],
+          "chat": []
+        }
+      },
+      "chats": [],
+      "currently": "Ava is debugging a web app for her group project.",
+      "action": {
+        "event": {
+          "subject": "Ava_Lee",
+          "predicate": "is",
+          "object": "to review documentation with group members ",
+          "describe": "to review documentation with group members ",
+          "address": [
+            "Columbia Campus",
+            "Butler Library",
+            "Reference Desk",
+            "computer"
+          ],
+          "emoji": "to review documentation with group members "
+        },
+        "obj_event": {
+          "subject": "computer",
+          "predicate": "is",
+          "object": "is idle for now.",
+          "describe": "is idle for now.",
+          "address": [
+            "Columbia Campus",
+            "Butler Library",
+            "Reference Desk",
+            "computer"
+          ],
+          "emoji": ""
+        },
+        "start": "20250213-09:50:00",
+        "duration": 5
+      },
+      "coord": [
+        32,
+        68
+      ]
+    },
+    "Benjamin_Carter": {
+      "config_path": "assets/village/agents/Benjamin_Carter/agent.json",
+      "status": {
+        "poignancy": 0
+      },
+      "schedule": {
+        "create": "20250213-09:30:00",
+        "daily_schedule": [
+          {
+            "idx": 0,
+            "describe": "sleeping",
+            "start": 0,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 1,
+            "describe": "sleeping",
+            "start": 60,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 2,
+            "describe": "sleeping",
+            "start": 120,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 3,
+            "describe": "sleeping",
+            "start": 180,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 4,
+            "describe": "sleeping",
+            "start": 240,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 5,
+            "describe": "sleeping",
+            "start": 300,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 6,
+            "describe": "sleeping",
+            "start": 360,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 7,
+            "describe": "sleeping",
+            "start": 420,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 8,
+            "describe": "sleeping",
+            "start": 480,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 9,
+            "describe": "sleeping",
+            "start": 540,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 10,
+            "describe": "sleeping",
+            "start": 600,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 11,
+            "describe": "Drink a glass of water and check emails",
+            "start": 660,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 12,
+            "describe": "Take a quick shower and get dressed",
+            "start": 720,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 13,
+            "describe": "Have breakfast and read the latest tech news",
+            "start": 780,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 14,
+            "describe": "Review experiment data for the diffusion model report",
+            "start": 840,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 15,
+            "describe": "Review experiment data for the diffusion model report",
+            "start": 900,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 16,
+            "describe": "Take a short break and have lunch",
+            "start": 960,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 17,
+            "describe": "Attend afternoon seminar on statistical modeling",
+            "start": 1020,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 18,
+            "describe": "Continue working on experiments for the diffusion model report",
+            "start": 1080,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 19,
+            "describe": "Continue working on experiments for the diffusion model report",
+            "start": 1140,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 20,
+            "describe": "Have a late snack and review notes",
+            "start": 1200,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 21,
+            "describe": "Late-night coding session for the diffusion model report",
+            "start": 1260,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 22,
+            "describe": "Late-night coding session for the diffusion model report",
+            "start": 1320,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 23,
+            "describe": "Late-night coding session for the diffusion model report",
+            "start": 1380,
+            "duration": 60,
+            "decompose": {}
+          }
+        ]
+      },
+      "associate": {
+        "memory": {
+          "event": [],
+          "thought": [
+            "node_0"
+          ],
+          "chat": []
+        }
+      },
+      "chats": [],
+      "currently": "Benjamin is running experiments for a diffusion model report.",
+      "action": {
+        "event": {
+          "subject": "Benjamin_Carter",
+          "predicate": "is",
+          "object": "sleeping",
+          "describe": "",
+          "address": [
+            "Columbia Campus",
+            "Mudd Hall",
+            "CS Lab",
+            "bed"
+          ],
+          "emoji": "😴"
+        },
+        "obj_event": {
+          "subject": "bed",
+          "predicate": "occupied by",
+          "object": "Benjamin_Carter",
+          "describe": "",
+          "address": [
+            "Columbia Campus",
+            "Mudd Hall",
+            "CS Lab",
+            "bed"
+          ],
+          "emoji": "🛌"
+        },
+        "start": "20250213-09:00:00",
+        "duration": 60
+      },
+      "coord": [
+        108,
+        27
+      ]
+    },
+    "Daniel_Kim": {
+      "config_path": "assets/village/agents/Daniel_Kim/agent.json",
+      "status": {
+        "poignancy": 15
+      },
+      "schedule": {
+        "create": "20250213-09:30:00",
+        "daily_schedule": [
+          {
+            "idx": 0,
+            "describe": "sleeping",
+            "start": 0,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 1,
+            "describe": "sleeping",
+            "start": 60,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 2,
+            "describe": "sleeping",
+            "start": 120,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 3,
+            "describe": "sleeping",
+            "start": 180,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 4,
+            "describe": "sleeping",
+            "start": 240,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 5,
+            "describe": "sleeping",
+            "start": 300,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 6,
+            "describe": "sleeping",
+            "start": 360,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 7,
+            "describe": "waking up",
+            "start": 420,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 8,
+            "describe": "eating breakfast",
+            "start": 480,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 9,
+            "describe": "attending morning lectures",
+            "start": 540,
+            "duration": 60,
+            "decompose": [
+              {
+                "idx": 0,
+                "describe": "to arrive at the lecture hall ",
+                "start": 540,
+                "duration": 5
+              },
+              {
+                "idx": 1,
+                "describe": "to find a seat near the front ",
+                "start": 545,
+                "duration": 5
+              },
+              {
+                "idx": 2,
+                "describe": "to take out his notes and review them ",
+                "start": 550,
+                "duration": 10
+              },
+              {
+                "idx": 3,
+                "describe": "to listen attentively during the lecture ",
+                "start": 560,
+                "duration": 20
+              },
+              {
+                "idx": 4,
+                "describe": "to take detailed notes on the board ",
+                "start": 580,
+                "duration": 15
+              },
+              {
+                "idx": 5,
+                "describe": "to ask questions if needed ",
+                "start": 595,
+                "duration": 5
+              }
+            ]
+          },
+          {
+            "idx": 10,
+            "describe": "attending morning lectures",
+            "start": 600,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 11,
+            "describe": "attending morning lectures",
+            "start": 660,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 12,
+            "describe": "attending morning lectures",
+            "start": 720,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 13,
+            "describe": "having lunch",
+            "start": 780,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 14,
+            "describe": "working on urban geography and GIS methods",
+            "start": 840,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 15,
+            "describe": "working on urban geography and GIS methods",
+            "start": 900,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 16,
+            "describe": "working on urban geography and GIS methods",
+            "start": 960,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 17,
+            "describe": "preparing for the field-mapping exercise in the afternoon labs",
+            "start": 1020,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 18,
+            "describe": "preparing for the field-mapping exercise in the afternoon labs",
+            "start": 1080,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 19,
+            "describe": "preparing for the field-mapping exercise in the afternoon labs",
+            "start": 1140,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 20,
+            "describe": "having dinner",
+            "start": 1200,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 21,
+            "describe": "evening walks",
+            "start": 1260,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 22,
+            "describe": "evening walks",
+            "start": 1320,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 23,
+            "describe": "evening walks",
+            "start": 1380,
+            "duration": 60,
+            "decompose": {}
+          }
+        ]
+      },
+      "associate": {
+        "memory": {
+          "event": [
+            "node_3",
+            "node_2",
+            "node_1"
+          ],
+          "thought": [
+            "node_0"
+          ],
+          "chat": []
+        }
+      },
+      "chats": [],
+      "currently": "Daniel is preparing a field-mapping exercise on urban heat islands.",
+      "action": {
+        "event": {
+          "subject": "Daniel_Kim",
+          "predicate": "is",
+          "object": "to take detailed notes on the board ",
+          "describe": "to take detailed notes on the board ",
+          "address": [
+            "Columbia Campus",
+            "Schermerhorn Hall",
+            "Classroom",
+            "seats"
+          ],
+          "emoji": "to take detailed notes on the board "
+        },
+        "obj_event": {
+          "subject": "seats",
+          "predicate": "is",
+          "object": "are empty and ready for use.",
+          "describe": "are empty and ready for use.",
+          "address": [
+            "Columbia Campus",
+            "Schermerhorn Hall",
+            "Classroom",
+            "seats"
+          ],
+          "emoji": ""
+        },
+        "start": "20250213-09:40:00",
+        "duration": 15
+      },
+      "coord": [
+        22,
+        28
+      ]
+    },
+    "Evelyn_Park": {
+      "config_path": "assets/village/agents/Evelyn_Park/agent.json",
+      "status": {
+        "poignancy": 9
+      },
+      "schedule": {
+        "create": "20250213-09:30:00",
+        "daily_schedule": [
+          {
+            "idx": 0,
+            "describe": "sleeping",
+            "start": 0,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 1,
+            "describe": "sleeping",
+            "start": 60,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 2,
+            "describe": "sleeping",
+            "start": 120,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 3,
+            "describe": "sleeping",
+            "start": 180,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 4,
+            "describe": "sleeping",
+            "start": 240,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 5,
+            "describe": "sleeping",
+            "start": 300,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 6,
+            "describe": "sleeping",
+            "start": 360,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 7,
+            "describe": "waking up",
+            "start": 420,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 8,
+            "describe": "eating breakfast",
+            "start": 480,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 9,
+            "describe": "attending early meeting",
+            "start": 540,
+            "duration": 60,
+            "decompose": [
+              {
+                "idx": 0,
+                "describe": "attend early meeting ",
+                "start": 540,
+                "duration": 5
+              },
+              {
+                "idx": 1,
+                "describe": "listen to meeting agenda item one ",
+                "start": 545,
+                "duration": 5
+              },
+              {
+                "idx": 2,
+                "describe": "participate in discussion on item one ",
+                "start": 550,
+                "duration": 5
+              },
+              {
+                "idx": 3,
+                "describe": "attend early meeting ",
+                "start": 555,
+                "duration": 5
+              },
+              {
+                "idx": 4,
+                "describe": "listen to meeting agenda item two ",
+                "start": 560,
+                "duration": 5
+              },
+              {
+                "idx": 5,
+                "describe": "participate in discussion on item two ",
+                "start": 565,
+                "duration": 5
+              },
+              {
+                "idx": 6,
+                "describe": "attend early meeting ",
+                "start": 570,
+                "duration": 5
+              },
+              {
+                "idx": 7,
+                "describe": "listen to meeting agenda item three ",
+                "start": 575,
+                "duration": 5
+              },
+              {
+                "idx": 8,
+                "describe": "participate in discussion on item three ",
+                "start": 580,
+                "duration": 10
+              },
+              {
+                "idx": 9,
+                "describe": "wrap up early meeting and prepare for next meeting ",
+                "start": 590,
+                "duration": 10
+              }
+            ]
+          },
+          {
+            "idx": 10,
+            "describe": "attending early meeting",
+            "start": 600,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 11,
+            "describe": "attending early meeting",
+            "start": 660,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 12,
+            "describe": "midday campus walk",
+            "start": 720,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 13,
+            "describe": "having lunch",
+            "start": 780,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 14,
+            "describe": "preparing for the address on research ethics and student well-being",
+            "start": 840,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 15,
+            "describe": "preparing for the address on research ethics and student well-being",
+            "start": 900,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 16,
+            "describe": "reviewing policy documents",
+            "start": 960,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 17,
+            "describe": "reviewing policy documents",
+            "start": 1020,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 18,
+            "describe": "finalizing the address",
+            "start": 1080,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 19,
+            "describe": "eating dinner",
+            "start": 1140,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 20,
+            "describe": "watching evening news",
+            "start": 1200,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 21,
+            "describe": "preparing for early meetings tomorrow",
+            "start": 1260,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 22,
+            "describe": "preparing for early meetings tomorrow",
+            "start": 1320,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 23,
+            "describe": "preparing for early meetings tomorrow",
+            "start": 1380,
+            "duration": 60,
+            "decompose": {}
+          }
+        ]
+      },
+      "associate": {
+        "memory": {
+          "event": [
+            "node_3",
+            "node_2",
+            "node_1"
+          ],
+          "thought": [
+            "node_0"
+          ],
+          "chat": []
+        }
+      },
+      "chats": [],
+      "currently": "Evelyn is preparing a campus-wide address on research ethics and student well-being.",
+      "action": {
+        "event": {
+          "subject": "Evelyn_Park",
+          "predicate": "is",
+          "object": "wrap up early meeting and prepare for next meeting ",
+          "describe": "wrap up early meeting and prepare for next meeting ",
+          "address": [
+            "Columbia Campus",
+            "摩尔家族's house",
+            "bathroom",
+            "toilet"
+          ],
+          "emoji": "wrap up early meeting and prepare for next meeting "
+        },
+        "obj_event": {
+          "subject": "toilet",
+          "predicate": "is",
+          "object": "is unused and clean.",
+          "describe": "is unused and clean.",
+          "address": [
+            "Columbia Campus",
+            "摩尔家族's house",
+            "bathroom",
+            "toilet"
+          ],
+          "emoji": ""
+        },
+        "start": "20250213-09:50:00",
+        "duration": 10
+      },
+      "coord": [
+        40,
+        68
+      ]
+    },
+    "Grace_Chen": {
+      "config_path": "assets/village/agents/Grace_Chen/agent.json",
+      "status": {
+        "poignancy": 24
+      },
+      "schedule": {
+        "create": "20250213-09:30:00",
+        "daily_schedule": [
+          {
+            "idx": 0,
+            "describe": "sleeping",
+            "start": 0,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 1,
+            "describe": "sleeping",
+            "start": 60,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 2,
+            "describe": "sleeping",
+            "start": 120,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 3,
+            "describe": "sleeping",
+            "start": 180,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 4,
+            "describe": "sleeping",
+            "start": 240,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 5,
+            "describe": "sleeping",
+            "start": 300,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 6,
+            "describe": "sleeping",
+            "start": 360,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 7,
+            "describe": "waking up and stretching",
+            "start": 420,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 8,
+            "describe": "having breakfast with oatmeal and fruit",
+            "start": 480,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 9,
+            "describe": "curating modern poetry list for seminar",
+            "start": 540,
+            "duration": 60,
+            "decompose": [
+              {
+                "idx": 0,
+                "describe": "to review modern poetry collections ",
+                "start": 540,
+                "duration": 10
+              },
+              {
+                "idx": 1,
+                "describe": "to select key poets and their works ",
+                "start": 550,
+                "duration": 10
+              },
+              {
+                "idx": 2,
+                "describe": "to organize selected poems by theme ",
+                "start": 560,
+                "duration": 10
+              },
+              {
+                "idx": 3,
+                "describe": "to add critical essays for context ",
+                "start": 570,
+                "duration": 10
+              },
+              {
+                "idx": 4,
+                "describe": "to integrate narrative theory insights ",
+                "start": 580,
+                "duration": 8
+              },
+              {
+                "idx": 5,
+                "describe": "to review and refine the list ",
+                "start": 588,
+                "duration": 7
+              },
+              {
+                "idx": 6,
+                "describe": "to print or save the curated list ",
+                "start": 595,
+                "duration": 3
+              },
+              {
+                "idx": 7,
+                "describe": "to organize notes for future reference ",
+                "start": 598,
+                "duration": 2
+              }
+            ]
+          },
+          {
+            "idx": 10,
+            "describe": "curating modern poetry list for seminar",
+            "start": 600,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 11,
+            "describe": "curating modern poetry list for seminar",
+            "start": 660,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 12,
+            "describe": "eating lunch at the plaza",
+            "start": 720,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 13,
+            "describe": "attending a comparative literature seminar",
+            "start": 780,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 14,
+            "describe": "attending a comparative literature seminar",
+            "start": 840,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 15,
+            "describe": "attending a comparative literature seminar",
+            "start": 900,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 16,
+            "describe": "reading and annotating poems related to identity",
+            "start": 960,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 17,
+            "describe": "reading and annotating poems related to identity",
+            "start": 1020,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 18,
+            "describe": "reading and annotating poems related to identity",
+            "start": 1080,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 19,
+            "describe": "having dinner at the plaza with a salad and grilled chicken",
+            "start": 1140,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 20,
+            "describe": "reflecting on the day's readings and curations",
+            "start": 1200,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 21,
+            "describe": "preparing for tomorrow's activities",
+            "start": 1260,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 22,
+            "describe": "preparing for tomorrow's activities",
+            "start": 1320,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 23,
+            "describe": "preparing for tomorrow's activities",
+            "start": 1380,
+            "duration": 60,
+            "decompose": {}
+          }
+        ]
+      },
+      "associate": {
+        "memory": {
+          "event": [
+            "node_4",
+            "node_3",
+            "node_2",
+            "node_1"
+          ],
+          "thought": [
+            "node_0"
+          ],
+          "chat": []
+        }
+      },
+      "chats": [],
+      "currently": "Grace is curating a reading list on modern poetry and identity.",
+      "action": {
+        "event": {
+          "subject": "Grace_Chen",
+          "predicate": "is",
+          "object": "to review and refine the list ",
+          "describe": "to review and refine the list ",
+          "address": [
+            "Columbia Campus",
+            "Butler Library",
+            "Reference Desk",
+            "computer"
+          ],
+          "emoji": "to review and refine the list "
+        },
+        "obj_event": {
+          "subject": "computer",
+          "predicate": "is",
+          "object": "is idle and ready for use.",
+          "describe": "is idle and ready for use.",
+          "address": [
+            "Columbia Campus",
+            "Butler Library",
+            "Reference Desk",
+            "computer"
+          ],
+          "emoji": ""
+        },
+        "start": "20250213-09:48:00",
+        "duration": 7
+      },
+      "coord": [
+        54,
+        48
+      ]
+    },
+    "Jason_Wright": {
+      "config_path": "assets/village/agents/Jason_Wright/agent.json",
+      "status": {
+        "poignancy": 15
+      },
+      "schedule": {
+        "create": "20250213-09:30:00",
+        "daily_schedule": [
+          {
+            "idx": 0,
+            "describe": "sleeping",
+            "start": 0,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 1,
+            "describe": "sleeping",
+            "start": 60,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 2,
+            "describe": "sleeping",
+            "start": 120,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 3,
+            "describe": "sleeping",
+            "start": 180,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 4,
+            "describe": "sleeping",
+            "start": 240,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 5,
+            "describe": "sleeping",
+            "start": 300,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 6,
+            "describe": "sleeping",
+            "start": 360,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 7,
+            "describe": "waking up, getting ready for the day",
+            "start": 420,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 8,
+            "describe": "eating breakfast",
+            "start": 480,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 9,
+            "describe": "arriving at campus plaza for patrol",
+            "start": 540,
+            "duration": 60,
+            "decompose": [
+              {
+                "idx": 0,
+                "describe": "to travel to campus plaza ",
+                "start": 540,
+                "duration": 10
+              },
+              {
+                "idx": 1,
+                "describe": "to park his vehicle and secure keys ",
+                "start": 550,
+                "duration": 5
+              },
+              {
+                "idx": 2,
+                "describe": "to check security equipment before patrol ",
+                "start": 555,
+                "duration": 5
+              },
+              {
+                "idx": 3,
+                "describe": "to conduct a visual inspection of the plaza area ",
+                "start": 560,
+                "duration": 10
+              },
+              {
+                "idx": 4,
+                "describe": "to document any maintenance issues observed ",
+                "start": 570,
+                "duration": 5
+              },
+              {
+                "idx": 5,
+                "describe": "to assist in setting up emergency equipment ",
+                "start": 575,
+                "duration": 5
+              },
+              {
+                "idx": 6,
+                "describe": "to engage with visitors and provide information ",
+                "start": 580,
+                "duration": 10
+              },
+              {
+                "idx": 7,
+                "describe": "to conduct a safety briefing for the day ",
+                "start": 590,
+                "duration": 5
+              },
+              {
+                "idx": 8,
+                "describe": "to secure all areas before starting patrol ",
+                "start": 595,
+                "duration": 5
+              }
+            ]
+          },
+          {
+            "idx": 10,
+            "describe": "assisting lost visitors and performing routine checks",
+            "start": 600,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 11,
+            "describe": "assisting lost visitors and performing routine checks",
+            "start": 660,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 12,
+            "describe": "assisting lost visitors and performing routine checks",
+            "start": 720,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 13,
+            "describe": "taking a lunch break",
+            "start": 780,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 14,
+            "describe": "resuming patrolling the campus area",
+            "start": 840,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 15,
+            "describe": "resuming patrolling the campus area",
+            "start": 900,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 16,
+            "describe": "resuming patrolling the campus area",
+            "start": 960,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 17,
+            "describe": "conducting evening patrol in high-traffic areas",
+            "start": 1020,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 18,
+            "describe": "assisting with any emergencies or urgent situations as they arise",
+            "start": 1080,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 19,
+            "describe": "assisting with any emergencies or urgent situations as they arise",
+            "start": 1140,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 20,
+            "describe": "assisting with any emergencies or urgent situations as they arise",
+            "start": 1200,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 21,
+            "describe": "conducting evening patrol in high-traffic areas",
+            "start": 1260,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 22,
+            "describe": "assisting with any emergencies or urgent situations as they arise",
+            "start": 1320,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 23,
+            "describe": "wrapping up patrol duties and preparing for shift end",
+            "start": 1380,
+            "duration": 60,
+            "decompose": {}
+          }
+        ]
+      },
+      "associate": {
+        "memory": {
+          "event": [
+            "node_4",
+            "node_3",
+            "node_2",
+            "node_1"
+          ],
+          "thought": [
+            "node_0"
+          ],
+          "chat": []
+        }
+      },
+      "chats": [],
+      "currently": "Jason is patrolling the campus plaza and assisting lost visitors.",
+      "action": {
+        "event": {
+          "subject": "Jason_Wright",
+          "predicate": "is",
+          "object": "to secure all areas before starting patrol ",
+          "describe": "to secure all areas before starting patrol ",
+          "address": [
+            "Columbia Campus",
+            "Security Office",
+            "Briefing Room",
+            "radio"
+          ],
+          "emoji": "to secure all areas before starting patrol "
+        },
+        "obj_event": {
+          "subject": "radio",
+          "predicate": "is",
+          "object": "is turned off and unused.",
+          "describe": "is turned off and unused.",
+          "address": [
+            "Columbia Campus",
+            "Security Office",
+            "Briefing Room",
+            "radio"
+          ],
+          "emoji": ""
+        },
+        "start": "20250213-09:55:00",
+        "duration": 5
+      },
+      "coord": [
+        127,
+        46
+      ]
+    },
+    "Liam_OConnor": {
+      "config_path": "assets/village/agents/Liam_OConnor/agent.json",
+      "status": {
+        "poignancy": 28
+      },
+      "schedule": {
+        "create": "20250213-09:30:00",
+        "daily_schedule": [
+          {
+            "idx": 0,
+            "describe": "sleeping",
+            "start": 0,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 1,
+            "describe": "sleeping",
+            "start": 60,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 2,
+            "describe": "sleeping",
+            "start": 120,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 3,
+            "describe": "sleeping",
+            "start": 180,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 4,
+            "describe": "sleeping",
+            "start": 240,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 5,
+            "describe": "sleeping",
+            "start": 300,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 6,
+            "describe": "sleeping",
+            "start": 360,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 7,
+            "describe": "Drink coffee and review notes from previous lectures",
+            "start": 420,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 8,
+            "describe": "Plan lecture topics for the day",
+            "start": 480,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 9,
+            "describe": "Start with a warm-up problem in graph theory",
+            "start": 540,
+            "duration": 60,
+            "decompose": [
+              {
+                "idx": 0,
+                "describe": "to prepare a warm-up problem ",
+                "start": 540,
+                "duration": 10
+              },
+              {
+                "idx": 1,
+                "describe": "to draw the graph for the warm-up problem on the blackboard ",
+                "start": 550,
+                "duration": 8
+              },
+              {
+                "idx": 2,
+                "describe": "to explain the properties of the graph ",
+                "start": 558,
+                "duration": 7
+              },
+              {
+                "idx": 3,
+                "describe": "to introduce basic concepts related to the problem ",
+                "start": 565,
+                "duration": 6
+              },
+              {
+                "idx": 4,
+                "describe": "to work through a solution step-by-step ",
+                "start": 571,
+                "duration": 10
+              },
+              {
+                "idx": 5,
+                "describe": "to verify each step of the solution ",
+                "start": 581,
+                "duration": 8
+              },
+              {
+                "idx": 6,
+                "describe": "to discuss potential alternative solutions or approaches ",
+                "start": 589,
+                "duration": 5
+              },
+              {
+                "idx": 7,
+                "describe": "to summarize key takeaways from the warm-up problem ",
+                "start": 594,
+                "duration": 3
+              },
+              {
+                "idx": 8,
+                "describe": "to transition to combinatorics examples ",
+                "start": 597,
+                "duration": 2
+              },
+              {
+                "idx": 9,
+                "describe": "to start with a simple combinatorics example ",
+                "start": 599,
+                "duration": 5
+              }
+            ]
+          },
+          {
+            "idx": 10,
+            "describe": "Move on to combinatorics examples",
+            "start": 600,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 11,
+            "describe": "Take a short break to drink more coffee",
+            "start": 660,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 12,
+            "describe": "Continue refining examples and proofs",
+            "start": 720,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 13,
+            "describe": "Review the lecture plan with a focus on clarity and engagement",
+            "start": 780,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 14,
+            "describe": "Prepare visual aids and additional resources for the class",
+            "start": 840,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 15,
+            "describe": "Eat lunch at 12:00 PM",
+            "start": 900,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 16,
+            "describe": "Short afternoon session to address any last-minute adjustments",
+            "start": 960,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 17,
+            "describe": "Wind down by organizing materials and cleaning up the blackboard area",
+            "start": 1020,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 18,
+            "describe": "Drink coffee and reflect on the day's work",
+            "start": 1080,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 19,
+            "describe": "Watch TV at 7:00 PM",
+            "start": 1140,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 20,
+            "describe": "sleeping",
+            "start": 1200,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 21,
+            "describe": "sleeping",
+            "start": 1260,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 22,
+            "describe": "sleeping",
+            "start": 1320,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 23,
+            "describe": "sleeping",
+            "start": 1380,
+            "duration": 60,
+            "decompose": {}
+          }
+        ]
+      },
+      "associate": {
+        "memory": {
+          "event": [
+            "node_4",
+            "node_3",
+            "node_2",
+            "node_1"
+          ],
+          "thought": [
+            "node_0"
+          ],
+          "chat": []
+        }
+      },
+      "chats": [],
+      "currently": "Liam is drafting examples for a proof techniques lecture.",
+      "action": {
+        "event": {
+          "subject": "Liam_OConnor",
+          "predicate": "is",
+          "object": "to summarize key takeaways from the warm-up problem ",
+          "describe": "to summarize key takeaways from the warm-up problem ",
+          "address": [
+            "Columbia Campus",
+            "Math Building",
+            "Classroom 3",
+            "desks"
+          ],
+          "emoji": "to summarize key takeaways from the warm-up problem "
+        },
+        "obj_event": {
+          "subject": "desks",
+          "predicate": "is",
+          "object": "are empty and ready for use.",
+          "describe": "are empty and ready for use.",
+          "address": [
+            "Columbia Campus",
+            "Math Building",
+            "Classroom 3",
+            "desks"
+          ],
+          "emoji": ""
+        },
+        "start": "20250213-09:54:00",
+        "duration": 3
+      },
+      "coord": [
+        55,
+        23
+      ]
+    },
+    "Marta_Lopez": {
+      "config_path": "assets/village/agents/Marta_Lopez/agent.json",
+      "status": {
+        "poignancy": 30
+      },
+      "schedule": {
+        "create": "20250213-09:30:00",
+        "daily_schedule": [
+          {
+            "idx": 0,
+            "describe": "sleeping",
+            "start": 0,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 1,
+            "describe": "sleeping",
+            "start": 60,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 2,
+            "describe": "sleeping",
+            "start": 120,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 3,
+            "describe": "sleeping",
+            "start": 180,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 4,
+            "describe": "sleeping",
+            "start": 240,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 5,
+            "describe": "sleeping",
+            "start": 300,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 6,
+            "describe": "sleeping",
+            "start": 360,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 7,
+            "describe": "waking up",
+            "start": 420,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 8,
+            "describe": "eating breakfast",
+            "start": 480,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 9,
+            "describe": "checking emails and preparing for the workshop",
+            "start": 540,
+            "duration": 60,
+            "decompose": [
+              {
+                "idx": 0,
+                "describe": "Check morning emails",
+                "start": 540,
+                "duration": 10
+              },
+              {
+                "idx": 1,
+                "describe": "Respond to urgent emails",
+                "start": 550,
+                "duration": 5
+              },
+              {
+                "idx": 2,
+                "describe": "Review workshop agenda",
+                "start": 555,
+                "duration": 10
+              },
+              {
+                "idx": 3,
+                "describe": "Prepare presentation slides",
+                "start": 565,
+                "duration": 15
+              },
+              {
+                "idx": 4,
+                "describe": "Organize handouts and materials",
+                "start": 580,
+                "duration": 10
+              },
+              {
+                "idx": 5,
+                "describe": "Set up workshop room (1 minute)",
+                "start": 590,
+                "duration": 1
+              },
+              {
+                "idx": 6,
+                "describe": "Briefly help Rosa with lunch rush menu preparation",
+                "start": 591,
+                "duration": 1
+              },
+              {
+                "idx": 7,
+                "describe": "Double-check equipment setup",
+                "start": 592,
+                "duration": 1
+              },
+              {
+                "idx": 8,
+                "describe": "Finalize any last-minute adjustments for the presentation slides",
+                "start": 593,
+                "duration": 1
+              },
+              {
+                "idx": 9,
+                "describe": "Final review of all materials and equipment",
+                "start": 594,
+                "duration": 1
+              },
+              {
+                "idx": 10,
+                "describe": "Prepare mentally and get ready to start the workshop on time",
+                "start": 595,
+                "duration": 5
+              }
+            ]
+          },
+          {
+            "idx": 10,
+            "describe": "conducting a final check of workshop materials",
+            "start": 600,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 11,
+            "describe": "opening Butler Library",
+            "start": 660,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 12,
+            "describe": "attending to any last-minute queries or concerns from participants",
+            "start": 720,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 13,
+            "describe": "eating lunch",
+            "start": 780,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 14,
+            "describe": "participating in the data literacy workshop",
+            "start": 840,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 15,
+            "describe": "participating in the data literacy workshop",
+            "start": 900,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 16,
+            "describe": "participating in the data literacy workshop",
+            "start": 960,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 17,
+            "describe": "assisting with wrapping up the workshop and answering questions",
+            "start": 1020,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 18,
+            "describe": "attending community events at Butler Library",
+            "start": 1080,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 19,
+            "describe": "attending community events at Butler Library",
+            "start": 1140,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 20,
+            "describe": "attending community events at Butler Library",
+            "start": 1200,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 21,
+            "describe": "concluding day's activities",
+            "start": 1260,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 22,
+            "describe": "relaxing",
+            "start": 1320,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 23,
+            "describe": "preparing for bed",
+            "start": 1380,
+            "duration": 60,
+            "decompose": {}
+          }
+        ]
+      },
+      "associate": {
+        "memory": {
+          "event": [
+            "node_7",
+            "node_5",
+            "node_4",
+            "node_3",
+            "node_2",
+            "node_1"
+          ],
+          "thought": [
+            "node_0"
+          ],
+          "chat": [
+            "node_6"
+          ]
+        }
+      },
+      "chats": [
+        [
+          "Marta_Lopez",
+          "Rosa, everything looks good with the pantry. How are you preparing for today's activities?"
+        ],
+        [
+          "Rosa_Martinez",
+          "Thanks for checking, Marta. I'm just finalizing the menu and making sure everything is in place for the lunch rush. How are you progressing with the presentation slides?"
+        ],
+        [
+          "Marta_Lopez",
+          "I'm on track with the slides. Just a few final tweaks before the workshop starts. Hope we have a great turnout!"
+        ]
+      ],
+      "currently": "Marta is organizing a data literacy workshop at Butler Library.",
+      "action": {
+        "event": {
+          "subject": "Marta_Lopez",
+          "predicate": "is",
+          "object": "Prepare mentally and get ready to start the workshop on time",
+          "describe": "Prepare mentally and get ready to start the workshop on time",
+          "address": [
+            "Columbia Campus",
+            "Butler Library",
+            "Reading Room",
+            "circulation desk"
+          ],
+          "emoji": "Prepare mentally and get ready to start the workshop on time"
+        },
+        "obj_event": {
+          "subject": "circulation desk",
+          "predicate": "is",
+          "object": "is idle and ready for use.",
+          "describe": "is idle and ready for use.",
+          "address": [
+            "Columbia Campus",
+            "Butler Library",
+            "Reading Room",
+            "circulation desk"
+          ],
+          "emoji": ""
+        },
+        "start": "20250213-09:55:00",
+        "duration": 5
+      },
+      "coord": [
+        45,
+        58
+      ]
+    },
+    "Noah_Patel": {
+      "config_path": "assets/village/agents/Noah_Patel/agent.json",
+      "status": {
+        "poignancy": 14
+      },
+      "schedule": {
+        "create": "20250213-09:30:00",
+        "daily_schedule": [
+          {
+            "idx": 0,
+            "describe": "sleeping",
+            "start": 0,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 1,
+            "describe": "sleeping",
+            "start": 60,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 2,
+            "describe": "sleeping",
+            "start": 120,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 3,
+            "describe": "sleeping",
+            "start": 180,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 4,
+            "describe": "sleeping",
+            "start": 240,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 5,
+            "describe": "Check maintenance requests and clean common areas",
+            "start": 300,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 6,
+            "describe": "Check maintenance requests and clean common areas",
+            "start": 360,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 7,
+            "describe": "Eat breakfast at 7:00 AM",
+            "start": 420,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 8,
+            "describe": "Start early rounds across classrooms and corridors",
+            "start": 480,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 9,
+            "describe": "Review safety procedures",
+            "start": 540,
+            "duration": 60,
+            "decompose": [
+              {
+                "idx": 0,
+                "describe": "review emergency exits and fire safety signs ",
+                "start": 540,
+                "duration": 10
+              },
+              {
+                "idx": 1,
+                "describe": "check first aid kits in classrooms ",
+                "start": 550,
+                "duration": 10
+              },
+              {
+                "idx": 2,
+                "describe": "inspect fire extinguishers and their accessibility ",
+                "start": 560,
+                "duration": 10
+              },
+              {
+                "idx": 3,
+                "describe": "verify emergency lighting is functioning properly ",
+                "start": 570,
+                "duration": 5
+              },
+              {
+                "idx": 4,
+                "describe": "check for tripping hazards in hallways ",
+                "start": 575,
+                "duration": 5
+              },
+              {
+                "idx": 5,
+                "describe": "review evacuation routes and signs ",
+                "start": 580,
+                "duration": 10
+              },
+              {
+                "idx": 6,
+                "describe": "ensure all staff are familiar with safety protocols ",
+                "start": 590,
+                "duration": 5
+              },
+              {
+                "idx": 7,
+                "describe": "document any maintenance or cleaning needs identified during rounds ",
+                "start": 595,
+                "duration": 5
+              }
+            ]
+          },
+          {
+            "idx": 10,
+            "describe": "Continue early rounds across classrooms and corridors",
+            "start": 600,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 11,
+            "describe": "Review safety procedures",
+            "start": 660,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 12,
+            "describe": "Eat lunch at 12:00 PM",
+            "start": 720,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 13,
+            "describe": "Continue early rounds across classrooms and corridors",
+            "start": 780,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 14,
+            "describe": "Plan evening tasks and schedule",
+            "start": 840,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 15,
+            "describe": "Plan evening tasks and schedule",
+            "start": 900,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 16,
+            "describe": "Plan evening tasks and schedule",
+            "start": 960,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 17,
+            "describe": "Eat dinner at 6:00 PM",
+            "start": 1020,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 18,
+            "describe": "Spend some time on personal tasks or reading",
+            "start": 1080,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 19,
+            "describe": "Prepare for the next day's tasks",
+            "start": 1140,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 20,
+            "describe": "Prepare for the next day's tasks",
+            "start": 1200,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 21,
+            "describe": "Prepare for the next day's tasks",
+            "start": 1260,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 22,
+            "describe": "Wind down and get ready for bed",
+            "start": 1320,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 23,
+            "describe": "Wind down and get ready for bed",
+            "start": 1380,
+            "duration": 60,
+            "decompose": {}
+          }
+        ]
+      },
+      "associate": {
+        "memory": {
+          "event": [
+            "node_2",
+            "node_1"
+          ],
+          "thought": [
+            "node_0"
+          ],
+          "chat": []
+        }
+      },
+      "chats": [],
+      "currently": "Noah is checking maintenance requests and cleaning common areas.",
+      "action": {
+        "event": {
+          "subject": "Noah_Patel",
+          "predicate": "is",
+          "object": "document any maintenance or cleaning needs identified during rounds ",
+          "describe": "document any maintenance or cleaning needs identified during rounds ",
+          "address": [
+            "Columbia Campus",
+            "Facilities",
+            "Workshop",
+            "storage"
+          ],
+          "emoji": "document any maintenance or cleaning needs identified during rounds "
+        },
+        "obj_event": {
+          "subject": "storage",
+          "predicate": "is",
+          "object": "contains maintenance items.",
+          "describe": "contains maintenance items.",
+          "address": [
+            "Columbia Campus",
+            "Facilities",
+            "Workshop",
+            "storage"
+          ],
+          "emoji": ""
+        },
+        "start": "20250213-09:55:00",
+        "duration": 5
+      },
+      "coord": [
+        94,
+        18
+      ]
+    },
+    "Priya_Nair": {
+      "config_path": "assets/village/agents/Priya_Nair/agent.json",
+      "status": {
+        "poignancy": 22
+      },
+      "schedule": {
+        "create": "20250213-09:30:00",
+        "daily_schedule": [
+          {
+            "idx": 0,
+            "describe": "sleeping",
+            "start": 0,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 1,
+            "describe": "sleeping",
+            "start": 60,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 2,
+            "describe": "sleeping",
+            "start": 120,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 3,
+            "describe": "sleeping",
+            "start": 180,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 4,
+            "describe": "sleeping",
+            "start": 240,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 5,
+            "describe": "sleeping",
+            "start": 300,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 6,
+            "describe": "sleeping",
+            "start": 360,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 7,
+            "describe": "waking up",
+            "start": 420,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 8,
+            "describe": "having breakfast",
+            "start": 480,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 9,
+            "describe": "checking emails and messages from team members",
+            "start": 540,
+            "duration": 60,
+            "decompose": [
+              {
+                "idx": 0,
+                "describe": "to check inbox emails ",
+                "start": 540,
+                "duration": 10
+              },
+              {
+                "idx": 1,
+                "describe": "to respond to urgent team member emails ",
+                "start": 550,
+                "duration": 5
+              },
+              {
+                "idx": 2,
+                "describe": "to check external project-related messages ",
+                "start": 555,
+                "duration": 5
+              },
+              {
+                "idx": 3,
+                "describe": "to review student team's progress updates ",
+                "start": 560,
+                "duration": 10
+              },
+              {
+                "idx": 4,
+                "describe": "to discuss immediate concerns with the team ",
+                "start": 570,
+                "duration": 10
+              },
+              {
+                "idx": 5,
+                "describe": "to plan next steps for the project ",
+                "start": 580,
+                "duration": 10
+              },
+              {
+                "idx": 6,
+                "describe": "to draft a summary of today's discussions ",
+                "start": 590,
+                "duration": 5
+              },
+              {
+                "idx": 7,
+                "describe": "to send out the summary to the team ",
+                "start": 595,
+                "duration": 5
+              }
+            ]
+          },
+          {
+            "idx": 10,
+            "describe": "reviewing project proposals with the student team",
+            "start": 600,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 11,
+            "describe": "having lunch",
+            "start": 660,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 12,
+            "describe": "coding review of the student team's project",
+            "start": 720,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 13,
+            "describe": "mentoring the student team on their AI capstone project",
+            "start": 780,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 14,
+            "describe": "mentoring the student team on their AI capstone project",
+            "start": 840,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 15,
+            "describe": "break for personal tasks and relaxation",
+            "start": 900,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 16,
+            "describe": "holding office hours for the student team",
+            "start": 960,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 17,
+            "describe": "reviewing meeting notes and preparing for tomorrow's tasks",
+            "start": 1020,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 18,
+            "describe": "having dinner",
+            "start": 1080,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 19,
+            "describe": "spending time on personal hobbies or reading",
+            "start": 1140,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 20,
+            "describe": "spending time on personal hobbies or reading",
+            "start": 1200,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 21,
+            "describe": "spending time on personal hobbies or reading",
+            "start": 1260,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 22,
+            "describe": "spending time on personal hobbies or reading",
+            "start": 1320,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 23,
+            "describe": "preparing for an early wake-up by setting the alarm",
+            "start": 1380,
+            "duration": 60,
+            "decompose": {}
+          }
+        ]
+      },
+      "associate": {
+        "memory": {
+          "event": [
+            "node_3",
+            "node_2",
+            "node_1"
+          ],
+          "thought": [
+            "node_0"
+          ],
+          "chat": []
+        }
+      },
+      "chats": [],
+      "currently": "Priya is advising a student team on their AI capstone project.",
+      "action": {
+        "event": {
+          "subject": "Priya_Nair",
+          "predicate": "is",
+          "object": "to send out the summary to the team ",
+          "describe": "to send out the summary to the team ",
+          "address": [
+            "Columbia Campus",
+            "Oak Hill College Dormitory",
+            "common room",
+            "common room桌子"
+          ],
+          "emoji": "to send out the summary to the team "
+        },
+        "obj_event": {
+          "subject": "common room桌子",
+          "predicate": "is",
+          "object": "is being used to type the summary.",
+          "describe": "is being used to type the summary.",
+          "address": [
+            "Columbia Campus",
+            "Oak Hill College Dormitory",
+            "common room",
+            "common room桌子"
+          ],
+          "emoji": ""
+        },
+        "start": "20250213-09:55:00",
+        "duration": 5
+      },
+      "coord": [
+        122,
+        49
+      ]
+    },
+    "Rosa_Martinez": {
+      "config_path": "assets/village/agents/Rosa_Martinez/agent.json",
+      "status": {
+        "poignancy": 38
+      },
+      "schedule": {
+        "create": "20250213-09:30:00",
+        "daily_schedule": [
+          {
+            "idx": 0,
+            "describe": "sleeping",
+            "start": 0,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 1,
+            "describe": "sleeping",
+            "start": 60,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 2,
+            "describe": "sleeping",
+            "start": 120,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 3,
+            "describe": "sleeping",
+            "start": 180,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 4,
+            "describe": "sleeping",
+            "start": 240,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 5,
+            "describe": "stretch and hydrate",
+            "start": 300,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 6,
+            "describe": "check inventory for lunch menu",
+            "start": 360,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 7,
+            "describe": "plan healthy menu options",
+            "start": 420,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 8,
+            "describe": "prep ingredients for the day's dishes",
+            "start": 480,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 9,
+            "describe": "eat breakfast at 7:00 AM",
+            "start": 540,
+            "duration": 60,
+            "decompose": [
+              {
+                "idx": 0,
+                "describe": "check the refrigerator and freezer contents",
+                "start": 591,
+                "duration": 4
+              },
+              {
+                "idx": 1,
+                "describe": "make necessary adjustments to inventory",
+                "start": 595,
+                "duration": 5
+              },
+              {
+                "idx": 2,
+                "describe": "eat breakfast",
+                "start": 540,
+                "duration": 5
+              },
+              {
+                "idx": 3,
+                "describe": "drink a glass of water",
+                "start": 545,
+                "duration": 5
+              },
+              {
+                "idx": 4,
+                "describe": "read the day's menu plan",
+                "start": 550,
+                "duration": 5
+              },
+              {
+                "idx": 5,
+                "describe": "check inventory levels for ingredients",
+                "start": 555,
+                "duration": 10
+              },
+              {
+                "idx": 6,
+                "describe": "prepare a list of needed ingredients",
+                "start": 565,
+                "duration": 10
+              },
+              {
+                "idx": 7,
+                "describe": "review the kitchen's cleanliness checklist",
+                "start": 575,
+                "duration": 5
+              },
+              {
+                "idx": 8,
+                "describe": "organize the pantry for easy access",
+                "start": 580,
+                "duration": 10
+              },
+              {
+                "idx": 9,
+                "describe": "Rosa and Marta are preparing for their respective tasks—Rosa for the lunch rush menu, and Marta for her presentation slides—for an upcoming workshop. Both hope for a great turnout.",
+                "start": 590,
+                "duration": 1
+              },
+              {
+                "idx": 10,
+                "describe": "check the refrigerator and freezer contents",
+                "start": 591,
+                "duration": 4
+              },
+              {
+                "idx": 11,
+                "describe": "make necessary adjustments to inventory",
+                "start": 595,
+                "duration": 5
+              }
+            ]
+          },
+          {
+            "idx": 10,
+            "describe": "clean up kitchen area",
+            "start": 600,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 11,
+            "describe": "review crowd flow optimization strategies",
+            "start": 660,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 12,
+            "describe": "organize supply storage",
+            "start": 720,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 13,
+            "describe": "manage lunch service efficiently",
+            "start": 780,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 14,
+            "describe": "take a quick break at 1:30 PM",
+            "start": 840,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 15,
+            "describe": "continue serving customers until noon rush subsides",
+            "start": 900,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 16,
+            "describe": "clean and prepare for the afternoon service",
+            "start": 960,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 17,
+            "describe": "eat dinner early to avoid the evening rush",
+            "start": 1020,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 18,
+            "describe": "watch TV or engage in leisure activities at 7:00 PM",
+            "start": 1080,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 19,
+            "describe": "watching TV or engaging in leisure activities",
+            "start": 1140,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 20,
+            "describe": "watching TV or engaging in leisure activities",
+            "start": 1200,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 21,
+            "describe": "watching TV or engaging in leisure activities",
+            "start": 1260,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 22,
+            "describe": "watching TV or engaging in leisure activities",
+            "start": 1320,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 23,
+            "describe": "preparing for the next day",
+            "start": 1380,
+            "duration": 60,
+            "decompose": {}
+          }
+        ]
+      },
+      "associate": {
+        "memory": {
+          "event": [
+            "node_7",
+            "node_6",
+            "node_4",
+            "node_3",
+            "node_2",
+            "node_1"
+          ],
+          "thought": [
+            "node_0"
+          ],
+          "chat": [
+            "node_5"
+          ]
+        }
+      },
+      "chats": [
+        [
+          "Marta_Lopez",
+          "Rosa, everything looks good with the pantry. How are you preparing for today's activities?"
+        ],
+        [
+          "Rosa_Martinez",
+          "Thanks for checking, Marta. I'm just finalizing the menu and making sure everything is in place for the lunch rush. How are you progressing with the presentation slides?"
+        ],
+        [
+          "Marta_Lopez",
+          "I'm on track with the slides. Just a few final tweaks before the workshop starts. Hope we have a great turnout!"
+        ]
+      ],
+      "currently": "Rosa is planning a healthy menu and managing the lunch rush.",
+      "action": {
+        "event": {
+          "subject": "Rosa_Martinez",
+          "predicate": "is",
+          "object": "make necessary adjustments to inventory",
+          "describe": "make necessary adjustments to inventory",
+          "address": [
+            "Columbia Campus",
+            "Cafeteria",
+            "Kitchen",
+            "prep tables"
+          ],
+          "emoji": "make necessary adjustments to inventory"
+        },
+        "obj_event": {
+          "subject": "prep tables",
+          "predicate": "is",
+          "object": "are set for service.",
+          "describe": "are set for service.",
+          "address": [
+            "Columbia Campus",
+            "Cafeteria",
+            "Kitchen",
+            "prep tables"
+          ],
+          "emoji": ""
+        },
+        "start": "20250213-09:55:00",
+        "duration": 5
+      },
+      "coord": [
+        46,
+        62
+      ]
+    },
+    "Sophia_Rossi": {
+      "config_path": "assets/village/agents/Sophia_Rossi/agent.json",
+      "status": {
+        "poignancy": 22
+      },
+      "schedule": {
+        "create": "20250213-09:30:00",
+        "daily_schedule": [
+          {
+            "idx": 0,
+            "describe": "sleeping",
+            "start": 0,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 1,
+            "describe": "sleeping",
+            "start": 60,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 2,
+            "describe": "sleeping",
+            "start": 120,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 3,
+            "describe": "sleeping",
+            "start": 180,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 4,
+            "describe": "sleeping",
+            "start": 240,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 5,
+            "describe": "sleeping",
+            "start": 300,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 6,
+            "describe": "sleeping",
+            "start": 360,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 7,
+            "describe": "waking up",
+            "start": 420,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 8,
+            "describe": "eating breakfast",
+            "start": 480,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 9,
+            "describe": "preparing for interviews at the plaza",
+            "start": 540,
+            "duration": 60,
+            "decompose": [
+              {
+                "idx": 0,
+                "describe": "to review interview questions ",
+                "start": 540,
+                "duration": 10
+              },
+              {
+                "idx": 1,
+                "describe": "to set up recording equipment ",
+                "start": 550,
+                "duration": 8
+              },
+              {
+                "idx": 2,
+                "describe": "to gather necessary materials ",
+                "start": 558,
+                "duration": 7
+              },
+              {
+                "idx": 3,
+                "describe": "to create a list of interviewees ",
+                "start": 565,
+                "duration": 6
+              },
+              {
+                "idx": 4,
+                "describe": "to check the weather and travel plan ",
+                "start": 571,
+                "duration": 5
+              },
+              {
+                "idx": 5,
+                "describe": "to review ethical guidelines for interviews ",
+                "start": 576,
+                "duration": 5
+              },
+              {
+                "idx": 6,
+                "describe": "to prepare notes on study habits topics ",
+                "start": 581,
+                "duration": 8
+              },
+              {
+                "idx": 7,
+                "describe": "to organize her backpack with supplies ",
+                "start": 589,
+                "duration": 4
+              },
+              {
+                "idx": 8,
+                "describe": "to double-check equipment and materials ",
+                "start": 593,
+                "duration": 2
+              },
+              {
+                "idx": 9,
+                "describe": "to leave for the plaza ",
+                "start": 595,
+                "duration": 1
+              },
+              {
+                "idx": 10,
+                "describe": "preparing for interviews at the plaza",
+                "start": 596,
+                "duration": 4
+              }
+            ]
+          },
+          {
+            "idx": 10,
+            "describe": "conducting interviews with students about study habits",
+            "start": 600,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 11,
+            "describe": "conducting interviews with students about study habits",
+            "start": 660,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 12,
+            "describe": "conducting interviews with students about study habits",
+            "start": 720,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 13,
+            "describe": "having lunch at a nearby café",
+            "start": 780,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 14,
+            "describe": "returning to the office and starting reporting on collected data",
+            "start": 840,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 15,
+            "describe": "completing afternoon reports",
+            "start": 900,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 16,
+            "describe": "taking a short break for dinner prep",
+            "start": 960,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 17,
+            "describe": "preparing dinner",
+            "start": 1020,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 18,
+            "describe": "having an early dinner",
+            "start": 1080,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 19,
+            "describe": "editing the morning's interviews",
+            "start": 1140,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 20,
+            "describe": "editing the morning's interviews",
+            "start": 1200,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 21,
+            "describe": "editing the morning's interviews",
+            "start": 1260,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 22,
+            "describe": "spending time reading or relaxing",
+            "start": 1320,
+            "duration": 60,
+            "decompose": {}
+          },
+          {
+            "idx": 23,
+            "describe": "winding down before bed",
+            "start": 1380,
+            "duration": 60,
+            "decompose": {}
+          }
+        ]
+      },
+      "associate": {
+        "memory": {
+          "event": [
+            "node_5",
+            "node_4",
+            "node_3",
+            "node_2",
+            "node_1"
+          ],
+          "thought": [
+            "node_0"
+          ],
+          "chat": []
+        }
+      },
+      "chats": [],
+      "currently": "Sophia is interviewing students about study habits at the plaza.",
+      "action": {
+        "event": {
+          "subject": "Sophia_Rossi",
+          "predicate": "is",
+          "object": "to leave for the plaza ",
+          "describe": "to leave for the plaza ",
+          "address": [
+            "Columbia Campus",
+            "Journalism School",
+            "Newsroom",
+            "studio"
+          ],
+          "emoji": "to leave for the plaza "
+        },
+        "obj_event": {
+          "subject": "studio",
+          "predicate": "is",
+          "object": "is idle and empty.",
+          "describe": "is idle and empty.",
+          "address": [
+            "Columbia Campus",
+            "Journalism School",
+            "Newsroom",
+            "studio"
+          ],
+          "emoji": ""
+        },
+        "start": "20250213-09:55:00",
+        "duration": 1
+      },
+      "coord": [
+        97,
+        18
+      ]
+    }
+  },
+  "step": 6
+}
