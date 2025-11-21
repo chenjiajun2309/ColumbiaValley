@@ -1,28 +1,106 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div id="game-container" style="text-align: center"></div>
-<div>
-    <div class="row">
-        <div class="col-md-12" style="border: solid; padding: 1em; padding-left:2em; padding-right:2em; border-radius: 5px;">
-            <div class="row" style="display: flex; flex-wrap: wrap; margin: -0.5em;">
-                {% for p in persona_names %}
-                <div style="text-align: center; margin: 0.5em;">
-                    <a href="javascript:void(0);" id="on_screen_det_trigger-{{ p }}" class="persona-trigger" data-persona="{{ p }}">
-                        <div style="padding: 0;">
-                            {% set image_static = 'assets/village/agents/' ~ p ~ '/portrait.png' %}
-                            <img src="{{ url_for('static', filename=image_static) }}" style="width: 32px; padding: 0;">
-                            <br>
-                            {{ p }}
-                        </div>
-                    </a>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
+<style>
+    body {
+        margin: 0;
+        padding-top: 150px;
+        background-color: #f7f7f7;
+    }
+    #game-container {
+        text-align: center;
+        background-color: #000;
+    }
+    #ui-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 0.75em 1.5em 0.5em;
+        z-index: 2500;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    #ui-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: clamp(0.4em, 1.2vw, 1em);
+        margin-bottom: 0.5em;
+    }
+    #ui-buttons button {
+        min-width: clamp(70px, 9vw, 120px);
+        padding: clamp(0.3em, 0.8vw, 0.6em) clamp(0.6em, 1.2vw, 1em);
+        border: 1px solid #d1d1d1;
+        border-radius: 4px;
+        background: #fcfbe6;
+        font-weight: 600;
+        font-size: clamp(0.8rem, 1.1vw, 1rem);
+    }
+    #ui-current-time {
+        font-weight: 600;
+        color: #464646;
+    }
+    #conversation-panel {
+        background: rgba(226, 243, 210, 0.95);
+        padding: 0.8em 1em;
+        border-radius: 8px;
+        min-height: 60px;
+        font-family: "Times New Roman", serif;
+        line-height: 1.35;
+        white-space: pre-wrap;
+        max-width: min(900px, calc(100vw - 140px));
+        margin: 0 auto;
+    }
+    .hidden {
+        display: none !important;
+    }
+    #persona-details {
+        padding: 1em 0 200px;
+    }
+    #persona-bar {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.95);
+        border-top: 1px solid #cccccc;
+        padding: 0.5em 1.5em;
+        z-index: 2000;
+        box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+    }
+    #persona-bar .persona-row {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 1em;
+        justify-content: center;
+        overflow-x: auto;
+    }
+    #persona-bar .persona-item {
+        text-align: center;
+        min-width: 60px;
+        flex: 0 0 auto;
+    }
+    #persona-bar img {
+        width: 40px;
+        height: 40px;
+    }
+</style>
+<div id="ui-overlay">
+    <div id="ui-buttons">
+        <button id="btn-run">[Run]</button>
+        <button id="btn-pause"> Pause </button>
+        <button id="btn-show-chat">[Show Chat]</button>
+        <button id="btn-hide-chat"> Hide Chat </button>
+        <span id="ui-current-time"></span>
     </div>
+    <div id="conversation-panel">--</div>
+</div>
 
-    <div class="media" id="on_screen_det_content-init" style="background-color:#EEEEEE; padding:1em; padding-left:2em; padding-right:2em; border-radius:5px; ">
+<div id="game-container"></div>
+
+<div id="persona-details">
+    <div class="media" id="on_screen_det_content-init" style="background-color:#EEEEEE; padding:1em; padding-left:2em; padding-right:2em; border-radius:5px;">
         <em>Click on an agent to view more details.</em>
     </div>
 
@@ -31,7 +109,6 @@
             <div class="media-left media-middle">
                 {% set image_static = 'assets/village/agents/' ~ p ~ '/portrait.png' %}
                 <img src="{{ url_for('static', filename=image_static) }}" style="width:3em">
-                <div style="display: none;" id="temp_focus"></div>
             </div>
             <div class="media-body" style='padding-left:3em; padding-top:1em; padding-bottom:0em'>
                 <div>
@@ -42,6 +119,25 @@
         </div>
     {% endfor %}
 </div>
+
+<div id="persona-bar">
+    <div class="persona-row">
+        {% for p in persona_names %}
+        <div class="persona-item">
+            <a href="javascript:void(0);" id="on_screen_det_trigger-{{ p }}" class="persona-trigger" data-persona="{{ p }}">
+                <div style="padding: 0;">
+                    {% set image_static = 'assets/village/agents/' ~ p ~ '/portrait.png' %}
+                    <img src="{{ url_for('static', filename=image_static) }}" alt="{{ p }}">
+                    <br>
+                    {{ p }}
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div id="temp_focus" style="display: none;"></div>
 
 {% endblock content %}
 

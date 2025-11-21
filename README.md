@@ -1,171 +1,138 @@
-[简体中文](./README.md) | English
+# ColumbiaValley – Generative Agents on Campus
 
-# Generative Agents Chinesized
+ColumbiaValley is an English-localized fork of the Generative Agents framework with a Columbia-themed campus, new agents, and a reworked replay UI (fixed top controls, bottom persona bar, adaptive zoom, etc.). This README explains how to configure the environment, run simulations, and replay results.
 
-## 1. Configure the environment
+---
 
-### 1.1 pull the source code:
+## 1. Environment Setup
 
-```
-git clone https://github.com/x-glacier/GenerativeAgentsCN.git
-cd GenerativeAgentsCN
-```
+### 1.1 Clone the repository
 
-### 1.2 configure the large language model
-
-Modify the configuration file `generative_agents/data/config.json`:
-1. By default, [Ollama](https://ollama.com/) is used to load local quantization models and OpenAI compatible APIs are provided. We need to first pull the quantization model and ensure that `base_url` and `model` are consistent with the actual configuration of Ollama.
-2. If you want to call other OpenAI compatible APIs, you need to change `provider` to `openai`, and modify `model`, `api_key` and `base_url` to the correct values.
-
-### 1.3 install python dependencies
-
-Use a virtual environment, e.g. with anaconda3:
-
-```
-conda create -n generative_agents_cn python=3.12
-conda activate generative_agents_cn
+```bash
+git clone https://github.com/chenjiajun2309/ColumbiaValley.git
+cd ColumbiaValley
 ```
 
-Install dependencies:
+### 1.2 Configure the language model backend
 
+We use [Ollama](https://ollama.com/) by default to serve:
+- Chat model: `qwen3:8b-q4_K_M`
+- Embedding model: `bge-m3`
+
+Edit `generative_agents/data/config.json`:
+
+```json
+{
+  "provider": "ollama",
+  "model": "qwen3:8b-q4_K_M",
+  "base_url": "http://127.0.0.1:11434",
+  "embedding_model": "bge-m3:latest"
+}
 ```
+
+If you prefer an OpenAI-compatible API, set `provider` to `"openai"` and supply `api_key`, `model`, and `base_url`.
+
+> See `docs/ollama.md` for full instructions on installing and configuring Ollama for this project.
+
+### 1.3 Install Python dependencies
+
+Python 3.12 is recommended. Using `venv`:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## 2. Start a simulation
+---
 
-```
+## 2. Run a Simulation
+
+All commands in this section are executed inside the `generative_agents` directory.
+
+```bash
 cd generative_agents
-python start.py --name sim-test --start "20240213-09:30" --step 10 --stride 10
+python start.py --name columbia1 --start "20250213-09:30" --step 120 --stride 10
 ```
 
-arguments:
-- `name` - the name of the simulation
-- `start` - the starting time of the simulated ville
-- `resume` - resume running the simulation
-- `step` - how many steps to simulate
-- `stride` - how many minutes to forward after each step, e.g. 9:00->9:10->9:20 if stride=10
+Key arguments:
+- `--name`: simulation identifier (data stored in `results/checkpoints/<name>`)
+- `--start`: simulation start time in `YYYYMMDD-HH:MM` format
+- `--step`: number of steps to simulate
+- `--stride`: minutes advanced per step (e.g., stride=10 → 09:00 → 09:10 → 09:20)
+- `--resume`: resume an existing simulation
 
-## 3. Replay a simulation
+After each run you’ll see checkpoint JSON files plus per-agent memory data under `results/checkpoints/<name>/`.
 
-### 3.1 generate replay data
+---
 
+## 3. Replay a Simulation
+
+### 3.1 Generate replay data
+
+```bash
+cd generative_agents
+python compress.py --name columbia1
 ```
-python compress.py --name <simulation-name>
-```
 
-After running, the replay data file `movement.json` will be generated in the `results/compressed/<simulation-name>` folder. At the same time, `simulation.md` will be generated to present the status and conversation of each agent in a timeline.
+This produces:
+- `results/compressed/<name>/movement.json` (frame-by-frame movement + actions)
+- `results/compressed/<name>/simulation.md` (text timeline of agent states/conversations)
 
-### 3.2 start the replay server
+### 3.2 Start the replay server
 
-**⚠️ Important: You must use Flask server, NOT `http.server`!**
-
-The replay interface depends on Flask + Jinja2 template rendering. If you use a static server, UI controls (Run/Pause/Show Chat buttons) will not display.
-
-**Correct way to start:**
+> **Important:** Use the Flask server (`python replay.py`). Do **not** use `http.server`, otherwise the Jinja2 templates will not render and you’ll lose the UI.
 
 ```bash
 cd generative_agents
 python replay.py
 ```
 
-The terminal should show:
+When you see `Running on http://127.0.0.1:5000/`, open the browser:
+
 ```
-* Running on http://127.0.0.1:5000/  (Press CTRL+C to quit)
-```
-
-**❌ Wrong way (DO NOT use):**
-```bash
-python -m http.server 5173 -d generative_agents/frontend/static
-```
-This will cause templates to fail rendering and all UI will disappear.
-
-**Visit the replay page:**
-
-Open in browser: `http://127.0.0.1:5000/?name=<simulation-name>`
-
-*Use arrow keys to move the camera*
-
-**URL parameters:**
-- `name` - The name of the simulation (required)
-- `step` - Starting step of replay, 0 means from the first frame, default is 0
-- `speed` - Replay speed (0-5), 0 is slowest, 5 is fastest, default is 2
-- `zoom` - Zoom ratio, default is 0.8
-
-**Example:**
-```
-http://127.0.0.1:5000/?name=sim-test&step=0&speed=2&zoom=0.6
+http://127.0.0.1:5000/?name=columbia1
 ```
 
-### 3.3 Troubleshooting Replay Issues
+Use arrow keys to pan the camera. Query parameters:
+- `name`: simulation name (required)
+- `step`: starting frame (default 0)
+- `speed`: replay speed (0–5, default 2)
+- `zoom`: initial zoom ratio (default 0.8)
 
-#### Issue 1: UI buttons (Run/Pause/Show Chat) not displaying
+### 3.3 Replay Troubleshooting
 
-**Symptoms:** No control buttons visible after page loads, only map is shown.
+| Issue | Cause | Fix |
+| --- | --- | --- |
+UI buttons missing | Serving via `http.server` | Launch with `python replay.py` |
+Agents missing / white squares | Static assets not found or atlas mismatch | Check Network tab for 404s; verify atlas JSONs (`generate_atlas_json.py`) |
+Agents don’t move | Movement data unchanged | Inspect `movement.json`; rerun simulation with more steps |
+Console `replayData is undefined` | Jinja template not rendered | Use Flask server; ensure `<script id="replay-data">` block is intact |
+Replay finishes instantly | Already at last frame | Button shows `[Replay finished]`; rerun simulation or lower start step |
+UI still in Chinese | Mixed-language templates | Ensure `frontend/templates/index.html` and `main_script.html` from this repo are deployed |
 
-**Cause:** Using `http.server` instead of Flask, causing Jinja2 templates (`{% ... %}` and `{{ ... }}`) to not render.
+---
 
-**Solution:**
-1. Confirm you're using `python replay.py` to start Flask server
-2. Check terminal output shows `Running on http://127.0.0.1:5000/`
-3. If you see `Serving HTTP on :: port ...`, you're using `http.server` incorrectly - stop it and use Flask instead
+## 4. Project Highlights
 
-#### Issue 2: Agents not displaying or showing as white blocks
+- 12 Columbia-themed agents with English bios, schedules, and locations.
+- Phaser-based map with adaptive zoom, top toolbar, and fixed persona bar.
+- Ollama/OpenAI-compatible LLM layer with fallback logic, improved error handling.
+- Replay UI improvements:  
+  * top controls remain aligned despite zoom changes  
+  * conversation box scales with viewport  
+  * bottom persona bar stays centered and scrollable  
+  * agent sprites enlarge (2×) while preserving texture slicing
 
-**Possible causes:**
+See `docs/` for additional guides (e.g., `docs/ollama.md`).
 
-1. **Incorrect resource paths:** Check browser Developer Tools Network panel for 404 errors
-   - Correct path: `/static/assets/village/agents/<Name>/texture.png`
-   - If you see 404, check if `frontend/static/assets/village/` directory exists
+---
 
-2. **Atlas frame name mismatch:** Run in browser Console:
-   ```javascript
-   game.scene.scenes[0].textures.get('Ava_Lee').getFrameNames()
-   ```
-   Confirm frame names are in format like `down`, `left-walk.000`, etc.
+## 5. References
 
-3. **Agents blocked by foreground layer:** Ensure agent sprite depth is set correctly:
-   ```javascript
-   new_sprite.setDepth(1.5);  // Should be greater than foreground layer depth
-   ```
+- [Generative Agents: Interactive Simulacra of Human Behavior](https://arxiv.org/abs/2304.03442)  
+- Original projects:  
+  * [joonspk-research/generative_agents](https://github.com/joonspk-research/generative_agents)  
+  * [Archermmt/wounderland](https://github.com/Archermmt/wounderland)
 
-#### Issue 3: Agents not moving or animations not playing
-
-**Possible causes:**
-
-1. **Coordinates unchanged in data:** Check `results/compressed/<name>/movement.json`, confirm `movement` coordinates change across different steps
-   - If all steps have same coordinates, simulation ran too briefly and agents didn't have time to move
-   - Solution: Re-run simulation with increased `--step` parameter (e.g., `--step 120`)
-
-2. **Data format mismatch:** Confirm agent names in `movement.json` use underscores (e.g., `Ava_Lee`), not spaces (e.g., `Ava Lee`)
-
-3. **Replay finished:** Check if button shows `[Replay finished]`, if so, replay has reached the last frame
-
-#### Issue 4: Console error `replayData is undefined`
-
-**Cause:** Template variables not rendered correctly, JSON data block is empty.
-
-**Solution:**
-1. Confirm you're using Flask server (not `http.server`)
-2. Check `<script id="replay-data">` tag in `frontend/templates/index.html` is correct
-3. Refresh page (Cmd+Shift+R for hard refresh)
-
-#### Issue 5: Incomplete translation to English
-
-**Symptoms:** Some UI elements still display in Chinese.
-
-**Solution:** Check if these files have been updated to English:
-- `frontend/templates/index.html` - Button text and hints
-- `frontend/templates/main_script.html` - Button labels and conversation text
-
-## 4. Reference
-
-### 4.1 paper
-
-[Generative Agents: Interactive Simulacra of Human Behavior](https://arxiv.org/abs/2304.03442)
-
-### 4.2 gitHub repository
-
-[Generative Agents](https://github.com/joonspk-research/generative_agents)
-
-[wounderland](https://github.com/Archermmt/wounderland)
+---

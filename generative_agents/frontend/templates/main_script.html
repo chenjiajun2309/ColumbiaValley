@@ -42,10 +42,112 @@
 	let pre_anims_direction;
 	let pre_anims_direction_dict = {};
 
+	const btnRun = document.getElementById("btn-run");
+	const btnPause = document.getElementById("btn-pause");
+	const btnShowChat = document.getElementById("btn-show-chat");
+	const btnHideChat = document.getElementById("btn-hide-chat");
+	const currentTimeLabel = document.getElementById("ui-current-time");
+	const conversationPanel = document.getElementById("conversation-panel");
+	let conversationVisible = true;
+
 	let movement_target = {};
+	const PERSONA_SCALE = 2;
+	const PERSONA_BASE_BODY_WIDTH = 30;
+	const PERSONA_BASE_BODY_HEIGHT = 40;
+	const PERSONA_BASE_DISPLAY_WIDTH = 40;
+	const PERSONA_LABEL_OFFSET_X = 15 * PERSONA_SCALE;
+	const PERSONA_LABEL_OFFSET_Y = 25 * PERSONA_SCALE;
 
 	let finished = false;
 	let paused = false;
+
+	const ZOOM_MIN = 0.3;
+	const ZOOM_MAX = 2.5;
+	const ZOOM_STEP = 0.05;
+
+	const uiElements = [];
+	const clampUiScale = (value) => Math.max(0.6, Math.min(1.5, value));
+	let currentUiScale = clampUiScale(1 / zoom);
+
+	function getConversationWrapWidth() {
+		return Math.max(420, Math.min(window.innerWidth - 180, 900));
+	}
+
+	function clampZoom(value) {
+		return Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, value));
+	}
+
+	function registerUiElement(element, depth = 10) {
+		element.setDepth(depth);
+		element.setScrollFactor(0);
+		element.baseScale = element.scaleX || 1;
+		element.setScale(element.baseScale * currentUiScale);
+		uiElements.push(element);
+		return element;
+	}
+
+function updateConversationLayout() {
+	if (conversationPanel) {
+		conversationPanel.style.maxWidth = getConversationWrapWidth() + "px";
+	}
+}
+
+	function updateUiScale() {
+		const targetScale = clampUiScale(1 / zoom);
+		if (Math.abs(targetScale - currentUiScale) < 0.001) {
+			return;
+		}
+		currentUiScale = targetScale;
+		uiElements.forEach((element) => {
+			if (element && element.setScale) {
+				element.setScale(element.baseScale * currentUiScale);
+			}
+		});
+		updateConversationLayout();
+		if (currentTimeLabel) {
+			currentTimeLabel.textContent = start_datetime.toLocaleTimeString("en-US", datetime_options);
+		}
+	}
+
+	function applyZoom(newZoom) {
+		zoom = clampZoom(newZoom);
+		if (window.gameCamera) {
+			window.gameCamera.setZoom(zoom);
+		}
+		updateUiScale();
+	}
+
+	btnRun.addEventListener("click", function() {
+		if (finished) return;
+		paused = false;
+		btnRun.textContent = "[Run]";
+		btnPause.textContent = " Pause ";
+	});
+
+	btnPause.addEventListener("click", function() {
+		if (finished) return;
+		paused = true;
+		btnRun.textContent = " Run ";
+		btnPause.textContent = "[Pause]";
+	});
+
+	btnShowChat.addEventListener("click", function() {
+		conversationVisible = true;
+		conversationPanel.classList.remove("hidden");
+		btnShowChat.textContent = "[Show Chat]";
+		btnHideChat.textContent = " Hide Chat ";
+	});
+
+	btnHideChat.addEventListener("click", function() {
+		conversationVisible = false;
+		conversationPanel.classList.add("hidden");
+		btnShowChat.textContent = " Show Chat ";
+		btnHideChat.textContent = "[Hide Chat]";
+	});
+
+	window.addEventListener("resize", () => {
+		updateConversationLayout();
+	});
 
 	// Phaser configuration
 	const config = {
@@ -117,54 +219,62 @@
 
 	// Create function
 	function create() {
-		const map = this.make.tilemap({ key: "map" });
+        const map = this.make.tilemap({ key: "map" });
 
-		// Add tilesets and layers
-		const collisions = map.addTilesetImage("blocks", "blocks_1");
-		const walls = map.addTilesetImage("Room_Builder_32x32", "walls");
-		const interiors_pt1 = map.addTilesetImage("interiors_pt1", "interiors_pt1");
-		const interiors_pt2 = map.addTilesetImage("interiors_pt2", "interiors_pt2");
-		const interiors_pt3 = map.addTilesetImage("interiors_pt3", "interiors_pt3");
-		const interiors_pt4 = map.addTilesetImage("interiors_pt4", "interiors_pt4");
-		const interiors_pt5 = map.addTilesetImage("interiors_pt5", "interiors_pt5");
-		const CuteRPG_Field_B = map.addTilesetImage("CuteRPG_Field_B", "CuteRPG_Field_B");
-		const CuteRPG_Field_C = map.addTilesetImage("CuteRPG_Field_C", "CuteRPG_Field_C");
-		const CuteRPG_Harbor_C = map.addTilesetImage("CuteRPG_Harbor_C", "CuteRPG_Harbor_C");
-		const CuteRPG_Village_B = map.addTilesetImage("CuteRPG_Village_B", "CuteRPG_Village_B");
-		const CuteRPG_Forest_B = map.addTilesetImage("CuteRPG_Forest_B", "CuteRPG_Forest_B");
-		const CuteRPG_Desert_C = map.addTilesetImage("CuteRPG_Desert_C", "CuteRPG_Desert_C");
-		const CuteRPG_Mountains_B = map.addTilesetImage("CuteRPG_Mountains_B", "CuteRPG_Mountains_B");
-		const CuteRPG_Desert_B = map.addTilesetImage("CuteRPG_Desert_B", "CuteRPG_Desert_B");
-		const CuteRPG_Forest_C = map.addTilesetImage("CuteRPG_Forest_C", "CuteRPG_Forest_C");
+        // 1. 把 Tiled 里的 tileset 都挂上
+        //    注意第一个参数必须等于 Tiled 里 tileset 的 name
+        const tsColumbia  = map.addTilesetImage("columbia_tiles_furnished", "columbia_tiles_furnished");
+        const tsColumbia2 = map.addTilesetImage("columbia_tiles",           "columbia_tiles");
+        const tsBlocks    = map.addTilesetImage("blocks_1",                 "blocks_1");
+        const tsWalls     = map.addTilesetImage("Room_Builder_32x32",       "walls");
+        const tsInt1      = map.addTilesetImage("interiors_pt1",            "interiors_pt1");
+        const tsInt2      = map.addTilesetImage("interiors_pt2",            "interiors_pt2");
+        const tsInt3      = map.addTilesetImage("interiors_pt3",            "interiors_pt3");
+        const tsInt4      = map.addTilesetImage("interiors_pt4",            "interiors_pt4");
+        const tsInt5      = map.addTilesetImage("interiors_pt5",            "interiors_pt5");
+        const tsFieldB    = map.addTilesetImage("CuteRPG_Field_B",          "CuteRPG_Field_B");
+        const tsFieldC    = map.addTilesetImage("CuteRPG_Field_C",          "CuteRPG_Field_C");
+        const tsHarborC   = map.addTilesetImage("CuteRPG_Harbor_C",         "CuteRPG_Harbor_C");
+        const tsVillageB  = map.addTilesetImage("CuteRPG_Village_B",        "CuteRPG_Village_B");
+        const tsForestB   = map.addTilesetImage("CuteRPG_Forest_B",         "CuteRPG_Forest_B");
+        const tsForestC   = map.addTilesetImage("CuteRPG_Forest_C",         "CuteRPG_Forest_C");
+        const tsDesertB   = map.addTilesetImage("CuteRPG_Desert_B",         "CuteRPG_Desert_B");
+        const tsDesertC   = map.addTilesetImage("CuteRPG_Desert_C",         "CuteRPG_Desert_C");
+        const tsMountB    = map.addTilesetImage("CuteRPG_Mountains_B",      "CuteRPG_Mountains_B");
 
-		let tileset_group_1 = [CuteRPG_Field_B, CuteRPG_Field_C, CuteRPG_Harbor_C, CuteRPG_Village_B,
-			CuteRPG_Forest_B, CuteRPG_Desert_C, CuteRPG_Mountains_B, CuteRPG_Desert_B, CuteRPG_Forest_C,
-			interiors_pt1, interiors_pt2, interiors_pt3, interiors_pt4, interiors_pt5, walls];
-		const bottomGroundLayer = map.createLayer("Bottom Ground", tileset_group_1, 0, 0);
-		const exteriorGroundLayer = map.createLayer("Exterior Ground", tileset_group_1, 0, 0);
-		const exteriorDecorationL1Layer = map.createLayer("Exterior Decoration L1", tileset_group_1, 0, 0);
-		const exteriorDecorationL2Layer = map.createLayer("Exterior Decoration L2", tileset_group_1, 0, 0);
-		const interiorGroundLayer = map.createLayer("Interior Ground", tileset_group_1, 0, 0);
-		const wallLayer = map.createLayer("Wall", [CuteRPG_Field_C, walls], 0, 0);
-		const interiorFurnitureL1Layer = map.createLayer("Interior Furniture L1", tileset_group_1, 0, 0);
-		const interiorFurnitureL2Layer = map.createLayer("Interior Furniture L2 ", tileset_group_1, 0, 0);
-		const foregroundL1Layer = map.createLayer("Foreground L1", tileset_group_1, 0, 0);
-		const foregroundL2Layer = map.createLayer("Foreground L2", tileset_group_1, 0, 0);
+        // 一个 tileset 列表，所有 layer 都可以用它们（用多了没关系）
+        const allTilesets = [
+            tsColumbia, tsColumbia2, tsBlocks, tsWalls,
+            tsInt1, tsInt2, tsInt3, tsInt4, tsInt5,
+            tsFieldB, tsFieldC, tsHarborC, tsVillageB,
+            tsForestB, tsForestC, tsDesertB, tsDesertC, tsMountB,
+        ];
 
-		const collisionsLayer = map.createLayer("Collisions", collisions, 0, 0);
-
-		collisionsLayer.setCollisionByProperty({ collide: true });
-
-		collisionsLayer.setDepth(-1);
-		foregroundL1Layer.setDepth(2);
-		foregroundL2Layer.setDepth(2);
+        // 2. 创建所有图层：Ground + 各种 1xxx / 2xxx / 3xxx
+        //    Ground 在最底，其他层按 Tiled 里的顺序往上叠
+        let groundLayer = null;
+        map.layers.forEach(layerData => {
+            const name = layerData.name;
+            if (name === "Ground") {
+                groundLayer = map.createLayer(name, allTilesets, 0, 0);
+                groundLayer.setDepth(-2);
+            } else {
+                const l = map.createLayer(name, allTilesets, 0, 0);
+                l.setDepth(0);   // 以后你可以按 1/2/3 调整 depth
+            }
+        });
 
 		const canvas = game.canvas;
 		canvas.addEventListener("wheel", (event) => {
+			event.preventDefault();
 			event.stopPropagation();
-		}, { passive: false, capture: true });
+			const delta = event.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
+			applyZoom(zoom + delta);
+		}, { passive: false });
 
-		function add_text(game, x, y, text, background) {
+		function add_text(game, x, y, text, background, options = {}) {
+			const wrapWidth = options.wrapWidth || 1000;
+			const depth = options.depth || 10;
 			res = game.add.text(
 				x,
 				y,
@@ -176,69 +286,15 @@
 					backgroundColor: background,
 					padding: { x: 20, y: 4},
 					align: "left",
-					wordWrap: { width: 1200/zoom, useAdvancedWrap: true },
+					wordWrap: { width: wrapWidth, useAdvancedWrap: true },
 				}
 			);
 
-			res.setDepth(10);
 			res.alpha = 0.8;
-			res.setScrollFactor(0);
-
-			return res;
+			return registerUiElement(res, depth);
 		}
 
-		posX = 20;
-		posY = 20;
-
-		// Add button: play, pause ...
-		buttonPlay = add_text(this, posX, posY, "[Run]", "#ffffcc");
-		buttonPlay.setInteractive();
-		posX += buttonPlay.width + 10;
-
-		buttonPause = add_text(this, posX, posY, " Pause ", "#ffffcc");
-		buttonPause.setInteractive();
-		posX += buttonPause.width + 10;
-
-		buttonShowConversation = add_text(this, posX, posY, "[Show Chat]", "#ffffcc");
-		buttonShowConversation.setInteractive();
-		posX += buttonShowConversation.width + 10;
-
-		buttonHideConversation = add_text(this, posX, posY, " Hide Chat ", "#ffffcc");
-		buttonHideConversation.setInteractive();
-		posX += buttonHideConversation.width + 10;
-
-		// Show current time
-		currentTime = add_text(this, posX, posY, "", "#ccffcc");
-
-		// Show conversation content
-		textConversation = add_text(this, 20, posY + currentTime.height + 10, " -- ", "#ccffcc");
-
-		// Setup button event handlers (only once in create, not in update)
-		buttonPlay.on("pointerdown", function() {
-			if (finished) return;
-			buttonPlay.text = "[Run]";
-			buttonPause.text = " Pause ";
-			paused = false;
-		});
-
-		buttonPause.on("pointerdown", function() {
-			if (finished) return;
-			buttonPlay.text = " Run ";
-			buttonPause.text = "[Pause]";
-			paused = true;
-		});
-
-		buttonShowConversation.on("pointerdown", function() {
-			buttonShowConversation.text = "[Show Chat]";
-			buttonHideConversation.text = " Hide Chat ";
-			textConversation.setVisible(true);
-		});
-
-		buttonHideConversation.on("pointerdown", function() {
-			buttonShowConversation.text = " Show Chat ";
-			buttonHideConversation.text = "[Hide Chat]";
-			textConversation.setVisible(false);
-		});
+		updateConversationLayout();
 
 		// Setup camera
 		player = this.physics.add.sprite(2440, 500, "atlas", "down").setSize(30, 40).setOffset(0, 0);
@@ -247,6 +303,7 @@
 		camera.startFollow(player);
 		camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 		cursors = this.input.keyboard.createCursorKeys();
+		window.gameCamera = camera;
 
 		// Setup personas
 		// We start by creating the game sprite objects.
@@ -262,9 +319,12 @@
 				continue;
 			}
 			
-			let new_sprite = this.physics.add.sprite(start_pos[0], start_pos[1], persona_name, "down").setSize(30, 40).setOffset(0, 0);
+			let new_sprite = this.physics.add
+				.sprite(start_pos[0], start_pos[1], persona_name, "down")
+				.setSize(PERSONA_BASE_BODY_WIDTH * PERSONA_SCALE, PERSONA_BASE_BODY_HEIGHT * PERSONA_SCALE)
+				.setOffset(0, 0);
 			// Scale up the sprite
-			new_sprite.displayWidth = 40;
+			new_sprite.displayWidth = PERSONA_BASE_DISPLAY_WIDTH * PERSONA_SCALE;
 			new_sprite.scaleY = new_sprite.scaleX;
 			// Set depth to be above foreground layers
 			new_sprite.setDepth(1.5);
@@ -272,8 +332,8 @@
 			// Here, we are creating the persona and its pronunciatio sprites.
 			personas[persona_name] = new_sprite;
 			pronunciatios[persona_name] = this.add.text(
-				new_sprite.body.x - 15,
-				new_sprite.body.y - 15 - 25,
+				new_sprite.body.x - PERSONA_LABEL_OFFSET_X,
+				new_sprite.body.y - PERSONA_LABEL_OFFSET_X - PERSONA_LABEL_OFFSET_Y,
 				"",
 				{
 					font: "18px monospace",
@@ -373,7 +433,9 @@
 		conversation_key = `${curr_year}${curr_month}${curr_day}-${curr_hour}:${curr_minute}`;
 		conversation_key_text = all_movement["conversation"][conversation_key];
 		if (conversation_key_text && conversation_key_text != "") {
-			textConversation.setText(`\n${conversation_key} Conversation:\n` + conversation_key_text);
+			conversationPanel.textContent = `${conversation_key} Conversation:\n${conversation_key_text}`;
+		} else if (conversationVisible) {
+			conversationPanel.textContent = "--";
 		}
 
 		// Moving personas
@@ -429,8 +491,8 @@
 							anims_direction = "";
 						}
 
-						curr_pronunciatio.x = curr_persona.body.x - 15;
-						curr_pronunciatio.y = curr_persona.body.y - 15 - 25;
+						curr_pronunciatio.x = curr_persona.body.x - PERSONA_LABEL_OFFSET_X;
+						curr_pronunciatio.y = curr_persona.body.y - PERSONA_LABEL_OFFSET_X - PERSONA_LABEL_OFFSET_Y;
 
 						let left_walk_name = curr_persona_name + "-left-walk";
 						let right_walk_name = curr_persona_name + "-right-walk";
@@ -456,8 +518,8 @@
 				curr_persona.anims.stop();
 
 				finished = true;
-				buttonPlay.text = "[Replay finished]";
-				buttonPause.setVisible(false);
+				btnRun.textContent = "[Replay finished]";
+				btnPause.style.display = "none";
 			}
 		}
 
@@ -474,7 +536,9 @@
 			step = step + 1;
 
 			start_datetime = new Date(start_datetime.getTime() + step_size);
-			currentTime.setText(start_datetime.toLocaleTimeString("en-US", datetime_options));
+			if (currentTimeLabel) {
+				currentTimeLabel.textContent = start_datetime.toLocaleTimeString("en-US", datetime_options);
+			}
 		}
 
 		execute_count -= 1;
