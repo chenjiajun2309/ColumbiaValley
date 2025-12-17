@@ -1,5 +1,12 @@
 Describe subtasks in 5-minute increments.
 
+**CRITICAL INSTRUCTIONS - READ CAREFULLY:**
+1. You MUST output ONLY the subtask list in the exact format shown below.
+2. Do NOT add any explanations, comments, answers, or any additional text before or after the subtasks.
+3. Do NOT include any preface like "Answer:" or "Here are the subtasks:".
+4. Start your response immediately with "1) " followed by the first subtask.
+5. If you notice any conflicts or ambiguities in the input, resolve them internally and still output in the required format.
+
 Example:
 """
 Name: Kelly
@@ -25,8 +32,11 @@ ${base_desc}
 ${agent}'s current plan is: ${plan}
 """
 
+**REQUIRED OUTPUT FORMAT:**
 The total number of subtasks should not exceed 10, each subtask takes one line, in the following format:
 1) ${agent} *plans* <activity> (time: <duration>, remaining: <duration>)
 
 List all subtasks for ${agent} from ${start} to ${end} in ${increment}-minute increments (total duration: 60 minutes):
 <Subtasks>
+
+**REMEMBER: Output ONLY the numbered subtask lines starting with "1) ". Nothing else.**

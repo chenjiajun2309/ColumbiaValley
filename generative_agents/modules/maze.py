@@ -132,11 +132,19 @@ class Maze:
 
         self.logger = logger
 
+    def _in_bounds(self, coord):
+        x, y = coord
+        return 0 <= x < self.maze_width and 0 <= y < self.maze_height
+
     def find_path(self, src_coord, dst_coord):
+        if not (self._in_bounds(src_coord) and self._in_bounds(dst_coord)):
+            return []
         if src_coord == dst_coord:
             return [src_coord]
 
-        distance_map = [[0 for _ in range(self.maze_width)] for _ in range(self.maze_height)]
+        distance_map = [
+            [0 for _ in range(self.maze_width)] for _ in range(self.maze_height)
+        ]
         frontier = [tuple(src_coord)]
         visited = {tuple(src_coord)}
         distance_map[src_coord[1]][src_coord[0]] = 1

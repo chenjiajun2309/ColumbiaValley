@@ -185,7 +185,17 @@ class Associate:
             "expire": expire.strftime("%Y%m%d-%H:%M:%S"),
             "access": create.strftime("%Y%m%d-%H:%M:%S"),
         }
+
+        # 将事件写入向量索引；如果底层因为 NaN 等问题导致插入失败，
+        # LlamaIndex.add_node 会返回 None，我们在这里做降级处理，避免打断游戏/RL 流程。
         node = self._index.add_node(event.get_describe(), metadata)
+
+        if node is None:
+            # 不把这个节点写入向量索引和长期记忆，只在当前 step 中返回一个临时 Concept。
+            # 注意这里的 node_id 不会再被使用到索引检索，因此可用任意唯一占位符。
+            tmp_id = f"temp_{node_type}_{create.strftime('%Y%m%d-%H%M%S')}"
+            return Concept.from_event(tmp_id, node_type, event, poignancy)
+
         memory = self.memory[node_type]
         memory.insert(0, node.id_)
         if len(memory) >= self.max_memory > 0:
@@ -235,6 +245,9 @@ class Associate:
                 node_ids=node_ids,
                 retriever_creator=_create_retriever,
             )
+            # 如果本次检索没有任何节点，则跳过该 focus，避免后续出现空列表导致的下游错误
+            if not nodes:
+                continue
             if reduce_all:
                 retrieved.update({n.id_: n for n in nodes})
             else:

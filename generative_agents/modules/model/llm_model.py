@@ -32,9 +32,17 @@ class LLMModel:
     ):
         response, self._meta_responses = None, []
         self._summary.setdefault(caller, [0, 0, 0])
-        for _ in range(retry):
+        for attempt in range(retry):
             try:
-                meta_response = self._completion(prompt, **kwargs).strip()
+                # On retry attempts, add stricter format instructions to prompt
+                enhanced_prompt = prompt
+                if attempt > 0 and ("schedule_daily" in caller or "schedule_decompose" in caller):
+                    if "schedule_daily" in caller:
+                        enhanced_prompt = prompt + "\n\nREMINDER: Output ONLY the schedule lines in format [HH:MM] Activity. No explanations."
+                    elif "schedule_decompose" in caller:
+                        enhanced_prompt = prompt + "\n\nREMINDER: Output ONLY the numbered subtask lines starting with '1) '. No explanations or answers."
+                
+                meta_response = self._completion(enhanced_prompt, **kwargs).strip()
                 self._meta_responses.append(meta_response)
                 self._summary["total"][0] += 1
                 self._summary[caller][0] += 1
@@ -43,7 +51,7 @@ class LLMModel:
                 else:
                     response = meta_response
             except Exception as e:
-                print(f"LLMModel.completion() caused an error: {e}")
+                print(f"LLMModel.completion() caused an error (attempt {attempt + 1}/{retry}): {e}")
                 time.sleep(5)
                 response = None
                 continue
@@ -94,6 +102,8 @@ class OpenAILLMModel(LLMModel):
 
 class OllamaLLMModel(LLMModel):
     def setup(self, config):
+        # Get timeout from config, default to 300 seconds (5 minutes)
+        self._timeout = config.get("timeout", 300)
         return None
 
     def ollama_chat(self, messages, temperature):
@@ -125,7 +135,7 @@ class OllamaLLMModel(LLMModel):
                 headers=headers,
                 json=params,
                 stream=False,
-                timeout=60
+                timeout=self._timeout
             )
             response.raise_for_status()
             return response.json()
@@ -191,7 +201,7 @@ class OllamaLLMModel(LLMModel):
                             headers=headers,
                             json=ollama_params,
                             stream=False,
-                            timeout=60
+                            timeout=self._timeout
                         )
                         response.raise_for_status()
                         ollama_response = response.json()
@@ -278,25 +288,69 @@ def create_llm_model(llm_config):
     return None
 
 
-def parse_llm_output(response, patterns, mode="match_last", ignore_empty=False):
+def parse_llm_output(response, patterns, mode="match_last", ignore_empty=False, failsafe=None):
+    """
+    Parse LLM output using regex patterns
+    
+    Args:
+        response: LLM response string
+        patterns: List of regex patterns or single pattern string
+        mode: "match_first", "match_last", or "match_all"
+        ignore_empty: If True, don't raise error on no match
+        failsafe: Default value to return if no match found (instead of raising error)
+        
+    Returns:
+        Matched string(s) or failsafe value
+    """
     if isinstance(patterns, str):
         patterns = [patterns]
     rets = []
+    
+    # Try matching each line
     for line in response.split("\n"):
-        line = line.replace("**", "").strip()
+        # Clean markdown formatting
+        line_clean = line.replace("**", "").replace("*", "").strip()
         for pattern in patterns:
             if pattern:
+                # Try original line first
                 matchs = re.findall(pattern, line)
+                if not matchs:
+                    # Try cleaned line
+                    matchs = re.findall(pattern, line_clean)
             else:
-                matchs = [line]
+                matchs = [line_clean]
             if len(matchs) >= 1:
                 rets.append(matchs[0])
                 break
-    if not ignore_empty and not rets:
+    
+    # If no line-by-line matches, try matching the whole response
+    if not rets:
+        for pattern in patterns:
+            if pattern:
+                matchs = re.findall(pattern, response, re.MULTILINE | re.DOTALL)
+                if matchs:
+                    rets.extend(matchs)
+                    break
+    
+    # Handle no matches
+    if not rets:
         # Print debug info when matching fails
-        print(f"parse_llm_output: Failed to match. Response preview: {response[:200]}...")
+        print(f"parse_llm_output: Failed to match. Response preview: {response[:500]}...")
         print(f"parse_llm_output: Patterns tried: {patterns}")
-        assert rets, "Failed to match llm output"
+        
+        # Use failsafe if provided
+        if failsafe is not None:
+            print(f"parse_llm_output: Using failsafe value: {failsafe}")
+            return failsafe
+        
+        # If ignore_empty is True, return None instead of raising error
+        if ignore_empty:
+            return None
+        
+        # Otherwise, raise error (original behavior)
+        raise ValueError(f"Failed to match llm output. Response: {response[:200]}... Patterns: {patterns}")
+    
+    # Return based on mode
     if mode == "match_first":
         return rets[0]
     if mode == "match_last":

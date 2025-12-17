@@ -12,9 +12,10 @@
         "think": {
             "llm": {
                 "provider": "ollama",
-                "model": "qwen2.5:7b-instruct-q4_K_M",
+                "model": "qwen3:8b-q4_K_M",
                 "base_url": "http://127.0.0.1:11434/v1",
-                "api_key": ""
+                "api_key": "a2395fefd0064f20acb8080120af7696.4HpC4tR3s0F6f75Z28B43Do4",
+                "timeout": 600
             },
             "interval": 1000,
             "poignancy_max": 150
@@ -25,7 +26,7 @@
                 "provider": "ollama",
                 "model": "bge-m3:latest",
                 "base_url": "http://127.0.0.1:11434",
-                "api_key": ""
+                "api_key": "a2395fefd0064f20acb8080120af7696.4HpC4tR3s0F6f75Z28B43Do4"
             },
             "retention": 8
         }

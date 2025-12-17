@@ -163,3 +163,35 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
+# --- IDE & System ---
+.idea/
+.vscode/
+.DS_Store
+__pycache__/
+*.pyc
+
+# --- Project Results & Data (重点过滤对象) ---
+# 过滤掉所有实验结果、检查点和压缩数据
+generative_agents/results/checkpoints/
+generative_agents/results/compressed/
+# 如果 results 目录下全是运行生成的临时文件，可以直接过滤整个目录
+# generative_agents/results/
+
+# --- Documentation Artifacts ---
+# 过滤 LaTeX 编译产生的中间文件（保留 .tex 源文件即可）
+*.aux
+*.log
+*.out
+*.toc
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+
+# --- Assets & Large Files ---
+# 如果某些图片是运行生成的，也可以过滤掉
+# generative_agents/frontend/static/assets/village/agents/*/portrait.png
+
+# --- External Repos ---
+# 看起来你有一个中文版的克隆，通常不建议嵌套仓库
+GenerativeAgentsCN/

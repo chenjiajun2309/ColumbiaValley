@@ -184,14 +184,74 @@ class Scratch:
         }
 
         def _callback(response):
+            # Try original format first
             patterns = [
                 r"\[(\d{1,2}:\d{2})\] " + self.name + r"(.*)。",
                 r"\[(\d{1,2}:\d{2})\] " + self.name + r"(.*)",
                 r"\[(\d{1,2}:\d{2})\] " + r"(.*)。",
                 r"\[(\d{1,2}:\d{2})\] " + r"(.*)",
             ]
-            outputs = parse_llm_output(response, patterns, mode="match_all")
-            assert len(outputs) >= 5, "less than 5 schedules"
+            outputs = parse_llm_output(response, patterns, mode="match_all", ignore_empty=True)
+            
+            # If no match, try markdown format (e.g., **0:00 - 5:00** Sleeping)
+            if not outputs or len(outputs) < 5:
+                patterns_markdown = [
+                    r"\*\*(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})\*\*\s*(.*?)(?:\n|$)",
+                    r"\*\*(\d{1,2}:\d{2})\*\*\s*(.*?)(?:\n|$)",
+                    r"(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})\s*(.*?)(?:\n|$)",
+                    r"(\d{1,2}:\d{2})\s*(.*?)(?:\n|$)",
+                ]
+                outputs_md = parse_llm_output(response, patterns_markdown, mode="match_all", ignore_empty=True)
+                if outputs_md:
+                    # Convert markdown format to standard format
+                    converted = []
+                    for item in outputs_md:
+                        if len(item) >= 2:
+                            time_str = item[0]  # Use first time
+                            activity = item[-1].strip() if len(item) > 1 else ""
+                            if activity:
+                                converted.append((time_str, activity))
+                    if len(converted) >= 5:
+                        outputs = converted
+            
+            # If still no match, try code block format
+            if not outputs or len(outputs) < 5:
+                # Extract from code blocks (```...```)
+                code_block_pattern = r"```.*?(\d{1,2}:\d{2})\s*[-:]\s*(\d{1,2}:\d{2}):\s*(.*?)(?:\n|```)"
+                code_matches = re.findall(code_block_pattern, response, re.DOTALL)
+                if code_matches:
+                    converted = [(match[0], match[2].strip()) for match in code_matches if match[2].strip()]
+                    if len(converted) >= 5:
+                        outputs = converted
+            
+            # If still no match, try simple time: activity format
+            if not outputs or len(outputs) < 5:
+                simple_patterns = [
+                    r"(\d{1,2}:\d{2})\s*[:：]\s*(.*?)(?:\n|$)",
+                    r"(\d{1,2}:\d{2})\s+(.*?)(?:\n|$)",
+                ]
+                outputs_simple = parse_llm_output(response, simple_patterns, mode="match_all", ignore_empty=True)
+                if outputs_simple and len(outputs_simple) >= 5:
+                    outputs = outputs_simple
+            
+            # If still no match, try extracting from natural language descriptions
+            if not outputs or len(outputs) < 5:
+                # Try to extract time and activity from natural language
+                # Pattern: "9:00: activity" or "At 9:00, activity" or "9:00 - activity"
+                natural_patterns = [
+                    r"(?:^|\n)\s*(\d{1,2}:\d{2})\s*[:：\-]\s*(.*?)(?:\n|$)",
+                    r"(?:^|\n)\s*(?:At|at)\s+(\d{1,2}:\d{2})[,\s]+(.*?)(?:\n|$)",
+                    r"(?:^|\n)\s*(\d{1,2}:\d{2})\s+(.*?)(?:\n|$)",
+                ]
+                natural_outputs = parse_llm_output(response, natural_patterns, mode="match_all", ignore_empty=True)
+                if natural_outputs and len(natural_outputs) >= 5:
+                    outputs = natural_outputs
+            
+            # If still no match, use failsafe
+            if not outputs or len(outputs) < 5:
+                # Use failsafe if still no match
+                return failsafe
+            
             return {s[0]: s[1] for s in outputs}
 
         return {"prompt": prompt, "callback": _callback, "failsafe": failsafe}
@@ -221,24 +281,59 @@ class Scratch:
         )
 
         def _callback(response):
+            # First, try to extract the subtask section if LLM added explanations
+            # Look for <Subtasks> tag or numbered list pattern
+            subtask_section = response
+            
+            # Try to find the actual subtask list, even if preceded by explanations
+            # Pattern 1: Look for <Subtasks> tag
+            subtask_match = re.search(r'<Subtasks>.*?(?=\n\n|\Z)', response, re.DOTALL | re.IGNORECASE)
+            if subtask_match:
+                subtask_section = subtask_match.group(0)
+            
+            # Pattern 2: Look for numbered list starting with "1) "
+            numbered_list_match = re.search(r'1\)\s+.*?(?=\n\n[^\d]|\Z)', response, re.DOTALL)
+            if numbered_list_match:
+                subtask_section = numbered_list_match.group(0)
+            
+            # Pattern 3: Extract all lines starting with number followed by )
+            all_numbered_lines = re.findall(r'^\d+\)\s+.*$', response, re.MULTILINE)
+            if all_numbered_lines:
+                subtask_section = '\n'.join(all_numbered_lines)
+            
+            # Now try to parse the extracted section
             patterns = [
-                r"\d{1,2}\) .*\*plans?\* (.*)[\(]+time[: ]+(\d{1,2})[, ]+remaining[: ]+\d*[\)]",
-                r"\d{1,2}\) .*\*plans?\* (.*)[\(]+duration[: ]+(\d{1,2})[, ]+remaining[: ]+\d*[\)]",
-                r"\d{1,2}\) .*\*plans?\* (.*)[\(]+(\d{1,2})[\)]",
-                r"\d{1,2}\)[\.\)]? (.*)[\(]+time[: ]+(\d{1,2})[, ]+remaining[: ]+\d*[\)]",
-                r"\d{1,2}\)[\.\)]? (.*)[\(]+(\d{1,2})[\)]",
+                r"\d{1,2}\)\s+.*?\*plans?\*\s+(.*?)\s*\([^)]*time[: ]+(\d+)[^)]*remaining[: ]+(\d+)[^)]*\)",
+                r"\d{1,2}\)\s+.*?\*plans?\*\s+(.*?)\s*\([^)]*time[: ]+(\d+)",
+                r"\d{1,2}\)\s+.*?\*plans?\*\s+(.*?)\s*\([^)]*(\d+)[^)]*\)",
+                r"\d{1,2}\)\s+.*?\*plans?\*\s+(.*?)\s*\([^)]*duration[: ]+(\d+)",
+                r"\d{1,2}\)\s+(.*?)\s*\([^)]*time[: ]+(\d+)[^)]*remaining[: ]+(\d+)[^)]*\)",
+                r"\d{1,2}\)\s+(.*?)\s*\([^)]*time[: ]+(\d+)",
+                r"\d{1,2}\)\s+(.*?)\s*\([^)]*(\d+)[^)]*\)",
             ]
-            schedules = parse_llm_output(response, patterns, mode="match_all")
+            
+            schedules = parse_llm_output(subtask_section, patterns, mode="match_all", ignore_empty=True)
+            
             if not schedules:
                 # Try more flexible patterns
                 patterns_flexible = [
                     r"\d+\)[\.\)]?\s+(.*?)\s*\([^)]*time[: ]*(\d+)",
                     r"\d+\)[\.\)]?\s+(.*?)\s*\([^)]*(\d+)[^)]*\)",
+                    r"\d+\)\s+(.*?)\s*\(.*?(\d+).*?\)",
                 ]
-                schedules = parse_llm_output(response, patterns_flexible, mode="match_all", ignore_empty=True)
+                schedules = parse_llm_output(subtask_section, patterns_flexible, mode="match_all", ignore_empty=True)
             
             if schedules:
-                schedules = [(s[0].strip("."), int(s[1])) for s in schedules if len(s) >= 2]
+                # Extract activity and duration (handle both 2-tuple and 3-tuple)
+                parsed = []
+                for s in schedules:
+                    if len(s) >= 2:
+                        activity = s[0].strip(".").strip()
+                        # Duration is the second element (or third if remaining is included)
+                        duration = int(s[1]) if len(s) >= 2 else 5
+                        parsed.append((activity, duration))
+                
+                schedules = parsed
                 left = plan["duration"] - sum([s[1] for s in schedules])
                 if left > 0:
                     schedules.append((plan["describe"], left))
@@ -341,7 +436,12 @@ class Scratch:
             arenas.update(
                 {a: sec for a in spatial.get_leaves(address + [sec]) if a not in arenas}
             )
-        failsafe = random.choice(sectors)
+        # Handle empty sectors list
+        if not sectors:
+            # Use current sector as failsafe
+            failsafe = curr_address[-1] if curr_address else "unknown"
+        else:
+            failsafe = random.choice(sectors)
 
         def _callback(response):
             patterns = [
@@ -378,7 +478,12 @@ class Scratch:
         )
 
         arenas = spatial.get_leaves(address)
-        failsafe = random.choice(arenas)
+        # Handle empty arenas list
+        if not arenas:
+            # Use target sector as failsafe
+            failsafe = address[-1] if address else "unknown"
+        else:
+            failsafe = random.choice(arenas)
 
         def _callback(response):
             patterns = [
@@ -405,7 +510,12 @@ class Scratch:
             }
         )
 
-        failsafe = random.choice(objects)
+        # Handle empty objects list
+        if not objects:
+            # Use a default object name based on the activity
+            failsafe = "object"
+        else:
+            failsafe = random.choice(objects)
 
         def _callback(response):
             # pattern = ["The most relevant object from the Objects is: <(.+?)>", "<(.+?)>"]
