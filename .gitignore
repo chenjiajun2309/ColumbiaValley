@@ -165,7 +165,6 @@ cython_debug/
 #.idea/
 
 # --- IDE & System ---
-.idea/
 .vscode/
 .DS_Store
 __pycache__/
@@ -184,5 +183,3 @@ generative_agents/results/compressed/
 *.fls
 *.synctex.gz
 
-
-docs/

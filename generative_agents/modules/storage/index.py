@@ -60,11 +60,6 @@ class LlamaIndex:
         max_retries: int = 3,
     ):
         """Add a node to the vector index.
-
-        为了避免某些「永久性错误」（例如 Ollama 返回 NaN 向量，导致
-        `json: unsupported value: NaN`）造成无限重试，这里增加了重试上限：
-        - 正常情况下插入成功，返回 TextNode；
-        - 连续多次失败或检测到 NaN 相关错误时，返回 None，让上层决定是否跳过。
         """
         attempts = 0
         while attempts < max_retries:

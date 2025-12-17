@@ -41,7 +41,7 @@ class StateExtractor:
         persona = agent.scratch.scratch if hasattr(agent.scratch, 'scratch') else {}
         return {
             "currently": agent.scratch.currently,
-            "persona_summary": str(persona)[:200] if persona else "",  # 截断
+            "persona_summary": str(persona)[:200] if persona else "",  
         }
     
     def _extract_spatial_features(self, agent: Agent) -> Dict:
@@ -87,7 +87,7 @@ class StateExtractor:
         relationships = {}
         
         for other_name, other_agent in nearby_agents.items():
-            # 计算关系强度（基于历史交互）
+
             relationship_score = self._compute_relationship_score(agent, other_agent)
             relationships[other_name] = {
                 "distance": self._compute_distance(agent.coord, other_agent.coord),
@@ -140,17 +140,17 @@ class StateExtractor:
     
     def _compute_relationship_score(self, agent: Agent, other: Agent) -> float:
         """Compute relationship score between two agents"""
-        # 基于历史对话和交互
+
         chats = agent.associate.retrieve_chats(other.name)
         if not chats:
             return 0.0
         
-        # 简单的评分：基于最近交互的频率和重要性
+
         recent_chats = [c for c in chats if c.access]
         if not recent_chats:
             return 0.0
         
-        # 使用最近交互的poignancy作为关系强度
+
         return sum(c.poignancy for c in recent_chats[:5]) / 10.0
     
     def _compute_action_progress(self, agent: Agent) -> float:
@@ -169,7 +169,7 @@ class StateExtractor:
         
         from modules import utils
         current_time = utils.get_timer().daily_duration()
-        # 简化：假设一天24小时
+
         return current_time / (24 * 60)
     
     def state_to_vector(self, state: Dict) -> np.ndarray:
@@ -179,10 +179,10 @@ class StateExtractor:
         This is a simplified version. In practice, you might want to use
         more sophisticated encoding (e.g., embeddings for text features)
         """
-        # 这里需要根据实际需求设计特征向量
+
         features = []
         
-        # Persona features (需要编码文本)
+
         features.append(len(state["persona_features"]["currently"]))
         
         # Spatial features

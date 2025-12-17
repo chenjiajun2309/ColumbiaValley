@@ -221,8 +221,7 @@ function updateConversationLayout() {
 	function create() {
         const map = this.make.tilemap({ key: "map" });
 
-        // 1. 把 Tiled 里的 tileset 都挂上
-        //    注意第一个参数必须等于 Tiled 里 tileset 的 name
+
         const tsColumbia  = map.addTilesetImage("columbia_tiles_furnished", "columbia_tiles_furnished");
         const tsColumbia2 = map.addTilesetImage("columbia_tiles",           "columbia_tiles");
         const tsBlocks    = map.addTilesetImage("blocks_1",                 "blocks_1");
@@ -242,7 +241,7 @@ function updateConversationLayout() {
         const tsDesertC   = map.addTilesetImage("CuteRPG_Desert_C",         "CuteRPG_Desert_C");
         const tsMountB    = map.addTilesetImage("CuteRPG_Mountains_B",      "CuteRPG_Mountains_B");
 
-        // 一个 tileset 列表，所有 layer 都可以用它们（用多了没关系）
+
         const allTilesets = [
             tsColumbia, tsColumbia2, tsBlocks, tsWalls,
             tsInt1, tsInt2, tsInt3, tsInt4, tsInt5,
@@ -250,8 +249,7 @@ function updateConversationLayout() {
             tsForestB, tsForestC, tsDesertB, tsDesertC, tsMountB,
         ];
 
-        // 2. 创建所有图层：Ground + 各种 1xxx / 2xxx / 3xxx
-        //    Ground 在最底，其他层按 Tiled 里的顺序往上叠
+
         let groundLayer = null;
         map.layers.forEach(layerData => {
             const name = layerData.name;
@@ -260,7 +258,7 @@ function updateConversationLayout() {
                 groundLayer.setDepth(-2);
             } else {
                 const l = map.createLayer(name, allTilesets, 0, 0);
-                l.setDepth(0);   // 以后你可以按 1/2/3 调整 depth
+                l.setDepth(0);   
             }
         });
 

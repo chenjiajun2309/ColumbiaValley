@@ -12,9 +12,6 @@ class RewardFunction:
     
     def __init__(self, config: Dict = None):
         self.config = config or {}
-        # Reward weights（可以通过 config 覆盖）
-        # 默认为：社交质量 + 关系提升 为主，日程与多样性为辅，
-        # persona_alignment 用作「软约束」，提醒 RL 不要过度偏离角色性格。
         self.weights = {
             "persona_alignment": self.config.get("persona_alignment_weight", 0.15),
             "interaction_quality": self.config.get("interaction_quality_weight", 0.4),
@@ -98,12 +95,9 @@ class RewardFunction:
         
         Returns value between -1 and 1
         """
-        # 一个轻量级的、基于关键词的 persona 对齐奖励：
-        # - 不额外调用 LLM，避免在每一步 RL 里增加开销；
-        # - 只作为「软偏好」，幅度在 [-1, 1]，由外层权重缩放。
         action_type = action_dict["type"]
 
-        # 从 Scratch 中拿到 persona 文本
+
         scratch_cfg = getattr(agent.scratch, "config", {}) or {}
         innate = str(scratch_cfg.get("innate", "")).lower()
         learned = str(scratch_cfg.get("learned", "")).lower()
@@ -112,7 +106,7 @@ class RewardFunction:
 
         score = 0.0
 
-        # 社交型：喜欢与人互动
+
         social_keywords = ["outgoing", "social", "collaborative", "friendly", "helpful", "talkative"]
         is_social = any(k in persona_text for k in social_keywords)
         if is_social:
@@ -123,7 +117,7 @@ class RewardFunction:
             elif action_type == ActionType.SKIP_REACTION:
                 score -= 0.6
 
-        # 探索 / 好奇：更愿意移动、更改计划
+
         curious_keywords = ["curious", "explor", "adventurous", "open-minded"]
         is_curious = any(k in persona_text for k in curious_keywords)
         if is_curious:
@@ -132,7 +126,6 @@ class RewardFunction:
             elif action_type == ActionType.WAIT:
                 score -= 0.2
 
-        # 沉稳 / 有条理：更偏向按计划执行、少改动
         disciplined_keywords = ["methodical", "organized", "disciplined", "calm", "focused"]
         is_disciplined = any(k in persona_text for k in disciplined_keywords)
         if is_disciplined:
@@ -163,18 +156,15 @@ class RewardFunction:
             # In practice, you'd check conversation logs
             recent_chats = [c for c in agent.chats if c[0] == target_name]
             if recent_chats:
-                # 根据最近一次对话长度给奖励，限制在 [0, 0.8] 左右，
-                # 留出一部分空间给 relationship_growth。
+
                 return min(len(recent_chats[-1][1]) / 120.0, 0.8)
             else:
-                # 发起了聊天但没有记录（极大可能失败）给一个中等偏小的惩罚，
-                # 防止 agent 疯狂乱聊，但又不至于完全不探索聊天。
+
                 return -0.1
         
         elif action_type == ActionType.WAIT:
-            # WAIT 本身不给强正奖励，避免 agent 通过高频等待「刷分」。
-            # 只有当后续聊天/关系提升时，才通过其他 reward 体现收益。
-            return 0.02  # 轻微正奖励，鼓励合理耐心，而不是主要得分手段
+
+            return 0.02 
         
         return 0.0
     
@@ -211,9 +201,7 @@ class RewardFunction:
             ).get("relationship_score", 0.0)
             
             # Reward relationship improvement.
-            # 关系分数通常变化很小，这里适当放大系数，确保有可见信号。
             growth = next_rel - prev_rel
-            # 正向幅度稍大，负向削弱，鼓励尝试社交即便偶尔失败。
             if growth >= 0:
                 return float(np.clip(growth * 4.0, 0.0, 1.0))
             else:
@@ -233,18 +221,17 @@ class RewardFunction:
         
         action_type = action_dict["type"]
         
-        # 我们只对「低价值行为」的过度重复进行惩罚，避免和按日程持续行动的目标冲突。
-        # 目前认为 CONTINUE / WAIT 属于此类，如果高价值动作重复，则不额外处罚。
+
         low_value_actions = {ActionType.CONTINUE, ActionType.WAIT}
 
         if len(agent.rl_action_history) > 0 and action_type in low_value_actions:
             recent_actions = agent.rl_action_history[-5:]  # Last 5 actions
             same_action_count = sum(1 for a in recent_actions if a == action_type)
 
-            # 最近 5 步里几乎全是同一低价值动作 → 轻微惩罚
+
             if same_action_count >= 4:
                 return -0.15
-            # 完全没出现过该动作 → 鼓励探索新类型
+
             elif same_action_count == 0:
                 return 0.1
         
