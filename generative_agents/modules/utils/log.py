@@ -55,18 +55,19 @@ class IOLogger(object):
 
 def create_io_logger(level: Union[str, int] = logging.INFO):
     if isinstance(level, str):
-        if level.startswith("debug"):
+        level_lower = level.lower()
+        if level_lower.startswith("debug"):
             level = logging.DEBUG
-        elif level == "info":
+        elif level_lower == "info":
             level = logging.INFO
-        elif level == "warn":
+        elif level_lower in ("warn", "warning"):
             level = logging.WARN
-        elif level == "error":
+        elif level_lower == "error":
             level = logging.ERROR
-        elif level == "critical":
+        elif level_lower == "critical":
             level = logging.CRITICAL
         else:
-            raise Exception("Unexcept verbose {}, should be debug| info| warn")
+            raise Exception("Unexpected verbose '{}', should be debug| info| warn|warning| error| critical".format(level))
     return IOLogger(level)
 
 
@@ -89,18 +90,19 @@ def create_file_logger(
     """
 
     if isinstance(level, str):
-        if level.startswith("debug"):
+        level_lower = level.lower()
+        if level_lower.startswith("debug"):
             level = logging.DEBUG
-        elif level == "info":
+        elif level_lower == "info":
             level = logging.INFO
-        elif level == "warn":
+        elif level_lower in ("warn", "warning"):
             level = logging.WARN
-        elif level == "error":
+        elif level_lower == "error":
             level = logging.ERROR
-        elif level == "critical":
+        elif level_lower == "critical":
             level = logging.CRITICAL
         else:
-            raise Exception("Unexcept verbose {}, should be debug| info| warn")
+            raise Exception("Unexpected verbose '{}', should be debug| info| warn|warning| error| critical".format(level))
 
     log_name = os.path.basename(path)
     logger = logging.getLogger(log_name)

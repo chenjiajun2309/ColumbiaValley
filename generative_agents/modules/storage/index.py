@@ -57,8 +57,12 @@ class LlamaIndex:
         exclude_llm_keys=None,
         exclude_embedding_keys=None,
         id=None,
+        max_retries: int = 3,
     ):
-        while True:
+        """Add a node to the vector index.
+        """
+        attempts = 0
+        while attempts < max_retries:
             try:
                 metadata = metadata or {}
                 exclude_llm_keys = exclude_llm_keys or list(metadata.keys())
@@ -75,8 +79,18 @@ class LlamaIndex:
                 self._index.insert_nodes([node])
                 return node
             except Exception as e:
+                attempts += 1
+                msg = str(e)
                 print(f"LlamaIndex.add_node() caused an error: {e}")
+                
+                if "unsupported value: NaN" in msg:
+                    break
+                if attempts >= max_retries:
+                    break
                 time.sleep(5)
+
+        
+        return None
 
     def has_node(self, node_id):
         return node_id in self._index.docstore.docs

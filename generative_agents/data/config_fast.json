@@ -1,0 +1,35 @@
+{
+    "agent": {
+        "percept": {
+            "mode": "box",
+            "vision_r": 8,
+            "att_bandwidth": 8
+        },
+        "schedule": {
+            "max_try": 5,
+            "diversity": 5
+        },
+        "think": {
+            "llm": {
+                "provider": "ollama",
+                "model": "qwen2.5:3b-q4_K_M",
+                "base_url": "http://127.0.0.1:11434/v1",
+                "api_key": "a2395fefd0064f20acb8080120af7696.4HpC4tR3s0F6f75Z28B43Do4",
+                "timeout": 180
+            },
+            "interval": 1000,
+            "poignancy_max": 300
+        },
+        "chat_iter": 2,
+        "associate": {
+            "embedding": {
+                "provider": "ollama",
+                "model": "bge-m3:latest",
+                "base_url": "http://127.0.0.1:11434",
+                "api_key": "a2395fefd0064f20acb8080120af7696.4HpC4tR3s0F6f75Z28B43Do4"
+            },
+            "retention": 8
+        }
+    }
+}
+

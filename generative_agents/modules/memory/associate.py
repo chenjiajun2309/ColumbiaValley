@@ -185,7 +185,15 @@ class Associate:
             "expire": expire.strftime("%Y%m%d-%H:%M:%S"),
             "access": create.strftime("%Y%m%d-%H:%M:%S"),
         }
+
+
         node = self._index.add_node(event.get_describe(), metadata)
+
+        if node is None:
+
+            tmp_id = f"temp_{node_type}_{create.strftime('%Y%m%d-%H%M%S')}"
+            return Concept.from_event(tmp_id, node_type, event, poignancy)
+
         memory = self.memory[node_type]
         memory.insert(0, node.id_)
         if len(memory) >= self.max_memory > 0:
@@ -235,6 +243,9 @@ class Associate:
                 node_ids=node_ids,
                 retriever_creator=_create_retriever,
             )
+
+            if not nodes:
+                continue
             if reduce_all:
                 retrieved.update({n.id_: n for n in nodes})
             else:

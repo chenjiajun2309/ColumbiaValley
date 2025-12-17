@@ -35,6 +35,27 @@ class Game:
 
             agent_config["storage_root"] = os.path.join(storage_root, name)
             self.agents[name] = Agent(agent_config, self.maze, self.conversation, self.logger)
+        
+        # Initialize RL Data Collector if RL is enabled
+        checkpoints_folder = os.path.join(f"results/checkpoints/{name}")
+        if config.get("use_rl", False):
+            try:
+                from modules.rl.data_collector import OnlineDataCollector
+                rl_config = config.get("rl", {})
+                collector_config = rl_config.get("collector", {})
+                collector_config["checkpoints_folder"] = checkpoints_folder
+                # Pass metrics config to collector
+                collector_config["metrics"] = rl_config.get("metrics", {})
+                collector_config["metrics"]["checkpoints_folder"] = checkpoints_folder
+                self.rl_collector = OnlineDataCollector(collector_config)
+                self.logger.info("RL Data Collector initialized")
+            except Exception as e:
+                self.logger.warning(f"Failed to initialize RL Data Collector: {e}")
+                import traceback
+                self.logger.warning(traceback.format_exc())
+                self.rl_collector = None
+        else:
+            self.rl_collector = None
 
     def get_agent(self, name):
         return self.agents[name]

@@ -3,8 +3,23 @@ ${base_desc}
 Here is the hourly breakdown of ${agent}'s schedule today:
 ${daily_schedule}
 
-Please refer to the above character information and schedule breakdown to generate an hourly plan (24-hour format), only fill in the <activity> content, do not skip any time point.
-The hourly plan must follow the format below:
+**CRITICAL INSTRUCTIONS - READ CAREFULLY:**
+1. You MUST output ONLY the schedule lines in the exact format shown below.
+2. Do NOT add any explanations, comments, tables, markdown formatting (asterisks, hashes), or any additional text.
+3. Do NOT include any preface, introduction, or conclusion.
+4. Start your response immediately with the first schedule line.
+5. If you notice any conflicts or ambiguities in the input, resolve them internally and still output in the required format.
+
+**REQUIRED OUTPUT FORMAT (copy this format exactly):**
 """
 ${hourly_schedule}
 """
+
+**EXAMPLE OUTPUT:**
+[6:00] Wake up
+[7:00] Eat breakfast
+[8:00] Review lesson plans
+[9:00] Teach class
+...
+
+**REMEMBER: Output ONLY the schedule lines. Nothing else.**

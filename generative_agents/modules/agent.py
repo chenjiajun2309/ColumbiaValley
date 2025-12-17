@@ -114,6 +114,13 @@ class Agent:
         return output
 
     def think(self, status, agents):
+        # RL Data Collection: Start collection
+        from modules.game import get_game
+        game = get_game()
+        collector = getattr(game, 'rl_collector', None)
+        if collector:
+            collector.start_collection(self.name, self, game)
+        
         events = self.move(status["coord"], status.get("path"))
         plan, _ = self.make_schedule()
 
@@ -135,13 +142,31 @@ class Agent:
                 duration=plan["duration"],
                 start=utils.get_timer().daily_time(plan["start"]),
             )
+            # RL Data Collection: Record sleep action
+            if collector:
+                collector.record_llm_action(
+                    self.name, self, game, "sleep",
+                    {"action": self.action.abstract()}
+                )
         if self.is_awake():
             self.percept()
             self.make_plan(agents)
             self.reflect()
+            # RL Data Collection: Record plan/think action for awake agents
+            if collector:
+                collector.record_llm_action(
+                    self.name, self, game, "think",
+                    {"plan": self.plan, "currently": self.scratch.currently}
+                )
         else:
             if self.action.finished():
                 self.action = self._determine_action()
+                # RL Data Collection: Record action determination
+                if collector:
+                    collector.record_llm_action(
+                        self.name, self, game, "determine_action",
+                        {"action": self.action.abstract()}
+                    )
 
         emojis = {}
         if self.action:
@@ -155,6 +180,11 @@ class Agent:
             "path": self.find_path(agents),
             "emojis": emojis,
         }
+        
+        # RL Data Collection: End collection
+        if collector:
+            collector.end_collection(self.name, self, game, done=False)
+        
         return self.plan
 
     def move(self, coord, path=None):
@@ -599,6 +629,16 @@ class Agent:
             chats, chat_summary, start, duration, other
         )
         other.schedule_chat(chats, chat_summary, start, duration, self)
+        
+        # RL Data Collection: Record chat interaction
+        from modules.game import get_game
+        game = get_game()
+        collector = getattr(game, 'rl_collector', None)
+        if collector:
+            collector.record_chat_interaction(
+                self.name, other.name, self, other, game, chats, chat_summary
+            )
+        
         return True
 
     def _wait_other(self, other, focus):

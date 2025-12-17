@@ -3,16 +3,38 @@ import copy
 import json
 import argparse
 import datetime
+import time
 
 from dotenv import load_dotenv, find_dotenv
+
+try:
+    from tqdm import tqdm
+    TQDM_AVAILABLE = True
+except ImportError:
+    TQDM_AVAILABLE = False
+    # Fallback: create a dummy tqdm class
+    class tqdm:
+        def __init__(self, *args, **kwargs):
+            pass
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+        def update(self, n=1):
+            pass
+        def set_description(self, desc):
+            pass
+        def set_postfix(self, **kwargs):
+            pass
 
 from modules.game import create_game, get_game
 from modules import utils
 
 personas = [
-    "Ava_Lee", "Benjamin_Carter", "Daniel_Kim", "Evelyn_Park",
-    "Grace_Chen", "Jason_Wright", "Liam_OConnor", "Marta_Lopez",
-    "Noah_Patel", "Priya_Nair", "Rosa_Martinez", "Sophia_Rossi",
+    "Ava_Lee", "Benjamin_Carter", "Daniel_Kim",
+    #"Evelyn_Park",
+    # "Grace_Chen", "Jason_Wright", "Liam_OConnor", "Marta_Lopez",
+    # "Noah_Patel", "Priya_Nair", "Rosa_Martinez", "Sophia_Rossi",
 ]
 
 
@@ -62,41 +84,280 @@ class SimulateServer:
             a.think_config["interval"] for a in self.game.agents.values()
         )
         self.start_step = start_step
+        
+        # Initialize RL Trainer if RL is enabled
+        self.rl_trainer = None
+        if config.get("use_rl", False):
+            try:
+                from modules.rl.mappo import MAPPOTrainer
+                rl_config = config.get("rl", {})
+                self.rl_trainer = MAPPOTrainer(
+                    agents=self.game.agents,
+                    game=self.game,
+                    config=rl_config.get("trainer", {})
+                )
+                self.logger.info("RL Trainer initialized")
+            except Exception as e:
+                self.logger.warning(f"Failed to initialize RL Trainer: {e}")
+                self.rl_trainer = None
+        
+        # RL training configuration
+        self.rl_train_interval = config.get("rl_train_interval", 10)  # Train every N steps
+        self.rl_enabled = config.get("use_rl", False) and self.rl_trainer is not None
 
     def simulate(self, step, stride=0):
         timer = utils.get_timer()
-        for i in range(self.start_step, self.start_step + step):
-            title = "Simulate Step[{}/{}, time: {}]".format(i+1, self.start_step + step, timer.get_date())
-            self.logger.info("\n" + utils.split_line(title, "="))
-            for name, status in self.agent_status.items():
-                plan = self.game.agent_think(name, status)["plan"]
-                agent = self.game.get_agent(name)
-                if name not in self.config["agents"]:
-                    self.config["agents"][name] = {}
-                self.config["agents"][name].update(agent.to_dict())
-                if plan.get("path"):
-                    status["coord"], status["path"] = plan["path"][-1], []
-                self.config["agents"][name].update(
-                    # {"coord": status["coord"], "path": plan["path"]}
-                    {"coord": status["coord"]}
+        total_steps = step
+        start_time = time.time()
+        
+        # Create progress bar
+        with tqdm(
+            total=total_steps,
+            initial=self.start_step,
+            desc="Simulation",
+            unit="step",
+            disable=not TQDM_AVAILABLE,
+            bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}]"
+        ) as pbar:
+            for i in range(self.start_step, self.start_step + step):
+                step_start_time = time.time()
+                current_step = i + 1 - self.start_step
+                
+                title = "Simulate Step[{}/{}, time: {}]".format(current_step, total_steps, timer.get_date())
+                self.logger.info("\n" + utils.split_line(title, "="))
+                
+                # Update progress bar description
+                sim_time_str = timer.get_date("%Y%m%d-%H:%M")
+                pbar.set_description(f"Step {current_step}/{total_steps} @ {sim_time_str}")
+                
+                # Each agent thinks (this will automatically collect RL data if enabled)
+                agent_start_time = time.time()
+                
+                # Update training step for metrics recorder (so rewards are recorded with correct step)
+                if self.rl_enabled and self.game.rl_collector and self.game.rl_collector.metrics_recorder:
+                    # Use current simulation step (i+1) for reward recording
+                    self.game.rl_collector.metrics_recorder.training_step = i + 1
+                
+                for name, status in self.agent_status.items():
+                    plan = self.game.agent_think(name, status)["plan"]
+                    agent = self.game.get_agent(name)
+                    if name not in self.config["agents"]:
+                        self.config["agents"][name] = {}
+                    self.config["agents"][name].update(agent.to_dict())
+                    if plan.get("path"):
+                        status["coord"], status["path"] = plan["path"][-1], []
+                    self.config["agents"][name].update(
+                        # {"coord": status["coord"], "path": plan["path"]}
+                        {"coord": status["coord"]}
+                    )
+                
+                agent_time = time.time() - agent_start_time
+
+                # RL Training: Collect data and train periodically
+                rl_train_time = 0
+                if self.rl_enabled and (i + 1) % self.rl_train_interval == 0:
+                    rl_start_time = time.time()
+                    self._rl_train_step(i + 1)
+                    rl_train_time = time.time() - rl_start_time
+
+                sim_time = timer.get_date("%Y%m%d-%H:%M")
+                self.config.update(
+                    {
+                        "time": sim_time,
+                        "step": i + 1,
+                    }
                 )
+                # Save Agent activity data
+                with open(f"{self.checkpoints_folder}/simulate-{sim_time.replace(':', '')}.json", "w", encoding="utf-8") as f:
+                    f.write(json.dumps(self.config, indent=2, ensure_ascii=False))
+                # Save conversation data
+                with open(f"{self.checkpoints_folder}/conversation.json", "w", encoding="utf-8") as f:
+                    f.write(json.dumps(self.game.conversation, indent=2, ensure_ascii=False))
 
-            sim_time = timer.get_date("%Y%m%d-%H:%M")
-            self.config.update(
-                {
-                    "time": sim_time,
-                    "step": i + 1,
+                if stride > 0:
+                    timer.forward(stride)
+                
+                # Update progress bar with timing information
+                step_time = time.time() - step_start_time
+                elapsed_time = time.time() - start_time
+                avg_time_per_step = elapsed_time / current_step if current_step > 0 else 0
+                remaining_steps = total_steps - current_step
+                estimated_remaining = avg_time_per_step * remaining_steps
+                
+                postfix_info = {
+                    "step_time": f"{step_time:.2f}s",
+                    "agent_time": f"{agent_time:.2f}s",
                 }
-            )
-            # Save Agent activity data
-            with open(f"{self.checkpoints_folder}/simulate-{sim_time.replace(':', '')}.json", "w", encoding="utf-8") as f:
-                f.write(json.dumps(self.config, indent=2, ensure_ascii=False))
-            # Save conversation data
-            with open(f"{self.checkpoints_folder}/conversation.json", "w", encoding="utf-8") as f:
-                f.write(json.dumps(self.game.conversation, indent=2, ensure_ascii=False))
-
-            if stride > 0:
-                timer.forward(stride)
+                if rl_train_time > 0:
+                    postfix_info["rl_train"] = f"{rl_train_time:.2f}s"
+                if remaining_steps > 0:
+                    postfix_info["ETA"] = f"{estimated_remaining/60:.1f}m"
+                
+                pbar.set_postfix(**postfix_info)
+                pbar.update(1)
+        
+        # Print summary
+        total_time = time.time() - start_time
+        self.logger.info(f"\n{'='*60}")
+        self.logger.info(f"Simulation completed!")
+        self.logger.info(f"Total steps: {total_steps}")
+        self.logger.info(f"Total time: {total_time/60:.2f} minutes ({total_time:.2f} seconds)")
+        self.logger.info(f"Average time per step: {total_time/total_steps:.2f} seconds")
+        if self.rl_enabled:
+            self.logger.info(f"RL training: Enabled (interval: {self.rl_train_interval} steps)")
+        self.logger.info(f"{'='*60}\n")
+        
+        # Generate RL metrics visualizations if RL is enabled
+        self.logger.info(f"Checking RL visualization conditions...")
+        self.logger.info(f"  rl_enabled: {self.rl_enabled}")
+        self.logger.info(f"  rl_collector exists: {self.game.rl_collector is not None}")
+        if self.game.rl_collector:
+            self.logger.info(f"  metrics_recorder exists: {self.game.rl_collector.metrics_recorder is not None}")
+        
+        if self.rl_enabled and self.game.rl_collector and self.game.rl_collector.metrics_recorder:
+            try:
+                self.logger.info("Generating RL metrics visualizations...")
+                from modules.rl.visualizer import RLMetricsVisualizer
+                
+                # Check if metrics recorder has any data
+                summary = self.game.rl_collector.metrics_recorder.get_summary()
+                self.logger.info(f"Metrics summary: {summary}")
+                
+                # Debug: Check reward history directly
+                reward_history = self.game.rl_collector.metrics_recorder.reward_history
+                self.logger.info(f"Reward history keys: {list(reward_history.keys())}")
+                for agent_name, history in reward_history.items():
+                    self.logger.info(f"  {agent_name}: {len(history)} rewards recorded")
+                
+                if not summary or not summary.get("agents"):
+                    self.logger.warning("No RL metrics data found. Skipping visualization generation.")
+                    self.logger.warning("This might mean:")
+                    self.logger.warning("  1. No rewards were recorded during simulation")
+                    self.logger.warning("  2. RL collector was not properly initialized")
+                    self.logger.warning("  3. Agents did not take any actions that generated rewards")
+                    self.logger.warning("  4. end_collection was called but action_dict was None")
+                    
+                    # Try to save metrics anyway (might have some data)
+                    metrics_file = self.game.rl_collector.metrics_recorder.save_metrics()
+                    if metrics_file:
+                        self.logger.info(f"RL metrics saved to: {metrics_file} (may be empty)")
+                    return
+                else:
+                    # Ensure checkpoints_folder is set
+                    if not self.game.rl_collector.metrics_recorder.checkpoints_folder:
+                        self.game.rl_collector.metrics_recorder.checkpoints_folder = self.checkpoints_folder
+                        self.logger.info(f"Set checkpoints_folder to: {self.checkpoints_folder}")
+                    
+                    # Save metrics
+                    metrics_file = self.game.rl_collector.metrics_recorder.save_metrics()
+                    if metrics_file:
+                        self.logger.info(f"RL metrics saved to: {metrics_file}")
+                    else:
+                        self.logger.warning("Failed to save RL metrics file (save_metrics returned None)")
+                        return
+                    
+                    # Generate visualizations
+                    viz_dir = os.path.join(self.checkpoints_folder, "rl_visualizations")
+                    os.makedirs(viz_dir, exist_ok=True)
+                    
+                    visualizer = RLMetricsVisualizer(metrics_file, viz_dir)
+                    visualizer.generate_all_visualizations()
+                    
+                    self.logger.info(f"RL visualizations saved to: {viz_dir}")
+                    self.logger.info("  - reward_trends.png")
+                    self.logger.info("  - reward_components.png")
+                    self.logger.info("  - reward_distribution.png")
+                    self.logger.info("  - action_distribution.png")
+                    self.logger.info("  - rl_summary.txt")
+                
+            except Exception as e:
+                self.logger.warning(f"Failed to generate RL visualizations: {e}")
+                import traceback
+                self.logger.warning(traceback.format_exc())
+        elif self.rl_enabled:
+            self.logger.warning("RL is enabled but metrics recorder is not available")
+            if not self.game.rl_collector:
+                self.logger.warning("  - RL collector is None")
+            elif not self.game.rl_collector.metrics_recorder:
+                self.logger.warning("  - Metrics recorder is None")
+    
+    def _rl_train_step(self, step):
+        """
+        Perform one RL training step
+        
+        Args:
+            step: Current simulation step
+        """
+        if not self.rl_enabled or not self.game.rl_collector:
+            return
+        
+        try:
+            train_start_time = time.time()
+            
+            # Get collected rollouts
+            rollouts = self.game.rl_collector.flush_all_buffers()
+            
+            if not rollouts:
+                return
+            
+            # Check if we have enough data
+            total_transitions = sum(len(r) for r in rollouts.values())
+            if total_transitions == 0:
+                return
+            
+            # Show training progress
+            if TQDM_AVAILABLE:
+                print(f"\n🔄 RL Training at step {step}: {total_transitions} transitions")
+            else:
+                self.logger.info(
+                    f"RL Training at step {step}: {total_transitions} transitions collected"
+                )
+            
+            # Train on collected data
+            self.rl_trainer.train_step(rollouts)
+            
+            # Record training metrics
+            if self.game.rl_collector and self.game.rl_collector.metrics_recorder:
+                # Update training step first
+                self.game.rl_collector.metrics_recorder.training_step = step
+                
+                # Calculate agent rewards from rollouts
+                agent_rewards = {}
+                agent_components = {}
+                for agent_name, agent_rollout in rollouts.items():
+                    if agent_rollout:
+                        # Sum rewards for this training step
+                        total_reward = sum(step.get("reward", 0.0) for step in agent_rollout)
+                        agent_rewards[agent_name] = total_reward
+                        
+                        # Extract components from transitions (if available)
+                        # Note: components might not be in rollout, so we'll use what we have
+                        agent_components[agent_name] = {}
+                
+                # Record training step metrics
+                self.game.rl_collector.metrics_recorder.record_training_step(
+                    step, agent_rewards, agent_components
+                )
+            
+            train_time = time.time() - train_start_time
+            
+            # Save models periodically
+            if step % (self.rl_train_interval * 10) == 0:
+                save_start_time = time.time()
+                model_path = os.path.join(self.checkpoints_folder, "rl_models", f"step_{step}")
+                os.makedirs(model_path, exist_ok=True)
+                self.rl_trainer.save_models(model_path)
+                save_time = time.time() - save_start_time
+                if TQDM_AVAILABLE:
+                    print(f"💾 Models saved to {model_path} (took {save_time:.2f}s)")
+                else:
+                    self.logger.info(f"RL models saved to {model_path} (took {save_time:.2f}s)")
+            
+            if TQDM_AVAILABLE:
+                print(f"✅ Training completed in {train_time:.2f}s\n")
+        
+        except Exception as e:
+            self.logger.warning(f"RL training failed at step {step}: {e}")
 
     def load_static(self, path):
         return utils.load_dict(os.path.join(self.static_root, path))
@@ -162,6 +423,8 @@ parser.add_argument("--step", type=int, default=10, help="The simulate step")
 parser.add_argument("--stride", type=int, default=10, help="The step stride in minute")
 parser.add_argument("--verbose", type=str, default="debug", help="The verbose level")
 parser.add_argument("--log", type=str, default="", help="Name of the log file")
+parser.add_argument("--use_rl", "--use-rl", action="store_true", dest="use_rl", help="Enable RL training")
+parser.add_argument("--rl_train_interval", "--rl-train-interval", type=int, default=10, dest="rl_train_interval", help="RL training interval (steps)")
 args = parser.parse_args()
 
 
@@ -194,6 +457,27 @@ if __name__ == "__main__":
         start_step = 0
 
     static_root = "frontend/static"
+    
+    # Add RL configuration if enabled
+    if args.use_rl:
+        if "rl" not in sim_config:
+            sim_config["rl"] = {}
+        sim_config["use_rl"] = True
+        sim_config["rl_train_interval"] = args.rl_train_interval
+        # Default RL config (can be overridden in config file)
+        if "trainer" not in sim_config["rl"]:
+            sim_config["rl"]["trainer"] = {
+                "lr": 3e-4,
+                "gamma": 0.99,
+                "gae_lambda": 0.95,
+                "clip_epsilon": 0.2,
+                "rollout_length": 2048,
+                "num_epochs": 10,
+            }
+        if "collector" not in sim_config["rl"]:
+            sim_config["rl"]["collector"] = {
+                "max_buffer_size": 1000,
+            }
 
     server = SimulateServer(name, static_root, checkpoints_folder, sim_config, start_step, args.verbose, args.log)
     server.simulate(args.step, args.stride)
