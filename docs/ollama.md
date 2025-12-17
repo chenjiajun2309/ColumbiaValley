@@ -1,78 +1,101 @@
-# 安装
+# Ollama Setup for ColumbiaValley
 
-下载地址：https://ollama.com/
+The ColumbiaValley agent stack uses an on-premise [Ollama](https://ollama.com/) runtime to serve both the chat model (`qwen3:8b-q4_K_M`) and the embedding model (`bge-m3`). Follow this guide to install Ollama, download the required models, and expose the API so `generative_agents` can connect to `http://localhost:11434`.
 
-默认选项安装即可。
+---
 
-# 下载模型
+## 1. Install Ollama
 
-在终端窗口输入命令，下载需要的模型。
+1. Download the latest release from [https://ollama.com/](https://ollama.com/).  
+2. Run the installer with the default options.  
+3. Verify the CLI is available:
 
-例如本项目默认使用的大语言模型是`qwen3:8b-q4_K_M`，嵌入模型是`bge-m3`，可通过以下命令下载：
+```bash
+ollama --version
 ```
+
+> **Hardware guidance**  
+> * Apple Silicon (M-series) with ≥16 GB RAM or Windows + RTX 30/40 GPUs with ≥12 GB VRAM are recommended for `qwen3:8b-q4_K_M`.  
+> * If you have ≥24 GB VRAM you may experiment with higher precision models, but our config expects the `q4_K_M` quantization.
+
+---
+
+## 2. Pull Project Models
+
+The ColumbiaValley repo expects two models. Download them once:
+
+```bash
 ollama pull qwen3:8b-q4_K_M
 ollama pull bge-m3:latest
 ```
 
-*注：MacOS系统M芯片+16G以上内存，或Windows系统30/40系列N卡+12G以上显存，建议使用qwen3-8b模型。24G以上显存可使用更大的量化模型*
+Use `ollama list` to confirm they are available.
 
-# 运行
+---
 
-可直接双击Ollama图标启动服务，也可通过命令行启动：
-```
+## 3. Start the Service
+
+You can launch Ollama via the GUI or the CLI:
+
+```bash
 ollama serve
 ```
 
-# 配置
+By default the server listens on `http://127.0.0.1:11434`. Our `generative_agents/data/config.json` points to this host/port, so no additional wiring is necessary as long as the service is running before you start `python generative_agents/start.py`.
 
-## 开启API
+---
 
-Windows系统启动服务前需要先配置系统环境变量，否则访问API服务报403错误：
-```
-OLLAMA_HOST=0.0.0.0
-OLLAMA_ORIGINS=*
-```
-配置方法：
-右键“我的电脑”->属性->高级系统设置->环境变量->系统变量->新建。
-在`变量名`和`变量值`中分别填入`OLLAMA_HOST`和`0.0.0.0`，即完成对`OLLAMA_HOST`环境变量的配置。其余环境变量同理。
+## 4. Allow API Requests
 
-MacOS系统通过以下命令设置环境变量：
-```
+To avoid HTTP 403 errors you must expose the API bindings.
+
+### macOS
+
+```bash
 launchctl setenv OLLAMA_HOST "0.0.0.0"
 launchctl setenv OLLAMA_ORIGINS "*"
 ```
 
-*启动后默认监听端口：11434*
+### Windows
 
-# 其他常用设置
+Add system environment variables (*System Properties → Advanced → Environment Variables*):
 
-## 1. 解决外网访问的问题
 ```
 OLLAMA_HOST=0.0.0.0
+OLLAMA_ORIGINS=*
 ```
 
-## 2. 解决Windows系统默认将模型下载到C盘的问题
-```
-OLLAMA_MODELS=E:\OllamaModels
+Restart the Ollama service after adding the variables.
+
+---
+
+## 5. Useful Environment Tweaks
+
+| Purpose | Variable | Example |
+| ------- | -------- | ------- |
+Bind to a different address/port | `OLLAMA_HOST` | `OLLAMA_HOST=0.0.0.0:11500` |
+Serve on all interfaces | `OLLAMA_HOST` | `OLLAMA_HOST=0.0.0.0` |
+Move model cache off the system drive | `OLLAMA_MODELS` | `OLLAMA_MODELS=D:\OllamaModels` |
+Keep models in RAM longer (default 5 min) | `OLLAMA_KEEP_ALIVE` | `OLLAMA_KEEP_ALIVE=2h` |
+Allow multiple concurrent requests | `OLLAMA_NUM_PARALLEL` | `OLLAMA_NUM_PARALLEL=2` |
+Permit multiple models loaded at once | `OLLAMA_MAX_LOADED_MODELS` | `OLLAMA_MAX_LOADED_MODELS=2` |
+
+Define these before `ollama serve` starts (e.g., in your shell profile or system env vars).
+
+---
+
+## 6. Verify Connectivity
+
+1. Ensure `ollama serve` is running.  
+2. From the repo root, call:
+
+```bash
+curl http://localhost:11434/api/tags
 ```
 
-## 3. 设置模型加载到内存中保留2小时
-*默认情况下，模型在卸载之前会在内存中保留5分钟*
-```
-OLLAMA_KEEP_ALIVE=2h
-```
+You should see a JSON list of installed models.  
+3. Launch the simulation (`python generative_agents/start.py`) and confirm the logs show `OllamaLLMModel` responses without authentication errors.
 
-## 4. 修改默认端口
-```
-OLLAMA_HOST=0.0.0.0:11434
-```
+If you still see 401/403 responses, double-check the `OLLAMA_HOST`/`OLLAMA_ORIGINS` values and restart the service.
 
-## 5. 设置多个用户并发请求
-```
-OLLAMA_NUM_PARALLEL=2
-```
-
-## 6. 设置同时加载多个模型
-```
-OLLAMA_MAX_LOADED_MODELS=2
-```
+---
