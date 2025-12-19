@@ -292,43 +292,43 @@ http://127.0.0.1:5000/?name=columbia1&step=0&speed=2&zoom=0.6
 ColumbiaValley/
 ├── generative_agents/
 │   ├── modules/
-│   │   ├── agent.py              # Agent class with RL integration
-│   │   ├── game.py               # Game environment with RL trainer
-│   │   ├── maze.py               # Campus map
-│   │   ├── memory/               # Memory systems (spatial, schedule, etc.)
-│   │   ├── model/                # LLM model interface
-│   │   ├── rl/                   # RL components
-│   │   │   ├── mappo/            # MAPPO implementation
+│   │   ├── agent.py              
+│   │   ├── game.py              
+│   │   ├── maze.py               
+│   │   ├── memory/               
+│   │   ├── model/               
+│   │   ├── rl/                   
+│   │   │   ├── mappo/            
 │   │   │   │   ├── trainer.py   # MAPPO trainer
 │   │   │   │   └── network.py   # Policy and value networks
-│   │   │   ├── data_collector.py # Online data collection
-│   │   │   ├── reward_function.py # Multi-component reward
+│   │   │   ├── data_collector.py 
+│   │   │   ├── reward_function.py 
 │   │   │   ├── state_extractor.py # State feature extraction
 │   │   │   └── action_space.py  # Action space definition
-│   │   └── utils/                # Utility functions
+│   │   └── utils/                
 │   ├── data/
-│   │   ├── config.json           # LLM configuration
-│   │   └── prompts/              # LLM prompts
-│   ├── frontend/                 # Replay UI
-│   │   ├── templates/            # Jinja2 templates
-│   │   └── static/               # Static assets
-│   ├── start.py                  # Main simulation script
-│   ├── compress.py               # Generate replay data
-│   ├── replay.py                 # Replay server
-│   └── compare_baseline.py       # Compare RL vs baseline
-├── docs/                         # Documentation
+│   │   ├── config.json          
+│   │   └── prompts/              
+│   ├── frontend/                 
+│   │   ├── templates/            
+│   │   └── static/               
+│   ├── start.py                 
+│   ├── compress.py              
+│   ├── replay.py               
+│   └── compare_baseline.py     
+├── docs/                        
 │   ├── ollama.md                 # Ollama setup guide
-│   ├── rl_usage_guide.md         # RL usage guide
+│   ├── rl_usage_guide.md         
 │   ├── mappo_implementation_guide.md
-│   └── ...                       # Additional docs
+│   └── ...                       
 ├── results/
 │   ├── checkpoints/              # Simulation checkpoints
 │   │   └── <name>/
-│   │       ├── rl_models/        # Trained RL models
-│   │       ├── rl_metrics.json  # Training metrics
-│   │       └── rl_visualizations/ # Training plots
-│   └── compressed/               # Replay data
-└── requirements.txt              # Python dependencies
+│   │       ├── storage/        
+│   │       ├── conversations.json  
+│   │       └── rl_visualizations/*
+│   └── compressed/               
+└── requirements.txt              
 ```
 
 ---
