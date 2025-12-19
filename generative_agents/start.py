@@ -31,7 +31,8 @@ from modules.game import create_game, get_game
 from modules import utils
 
 personas = [
-    "Ava_Lee", "Benjamin_Carter", "Daniel_Kim",
+    "Ava_Lee", 
+    "Benjamin_Carter", "Daniel_Kim",
     #"Evelyn_Park",
     # "Grace_Chen", "Jason_Wright", "Liam_OConnor", "Marta_Lopez",
     # "Noah_Patel", "Priya_Nair", "Rosa_Martinez", "Sophia_Rossi",
@@ -85,25 +86,15 @@ class SimulateServer:
         )
         self.start_step = start_step
         
-        # Initialize RL Trainer if RL is enabled
-        self.rl_trainer = None
-        if config.get("use_rl", False):
-            try:
-                from modules.rl.mappo import MAPPOTrainer
-                rl_config = config.get("rl", {})
-                self.rl_trainer = MAPPOTrainer(
-                    agents=self.game.agents,
-                    game=self.game,
-                    config=rl_config.get("trainer", {})
-                )
-                self.logger.info("RL Trainer initialized")
-            except Exception as e:
-                self.logger.warning(f"Failed to initialize RL Trainer: {e}")
-                self.rl_trainer = None
-        
         # RL training configuration
+        # Note: Trainer is already initialized in Game.__init__() if use_rl=True
         self.rl_train_interval = config.get("rl_train_interval", 10)  # Train every N steps
-        self.rl_enabled = config.get("use_rl", False) and self.rl_trainer is not None
+        self.rl_enabled = config.get("use_rl", False) and self.game.rl_trainer is not None
+        
+        if self.rl_enabled:
+            self.logger.info(f"RL training enabled (interval: {self.rl_train_interval} steps)")
+        elif config.get("use_rl", False):
+            self.logger.warning("RL is enabled in config but trainer is not available")
 
     def simulate(self, step, stride=0):
         timer = utils.get_timer()
@@ -157,7 +148,8 @@ class SimulateServer:
                 rl_train_time = 0
                 if self.rl_enabled and (i + 1) % self.rl_train_interval == 0:
                     rl_start_time = time.time()
-                    self._rl_train_step(i + 1)
+                    # Use Game's rl_train_step method (which uses the trainer initialized in Game)
+                    self.game.rl_train_step(i + 1)
                     rl_train_time = time.time() - rl_start_time
 
                 sim_time = timer.get_date("%Y%m%d-%H:%M")
@@ -207,14 +199,16 @@ class SimulateServer:
             self.logger.info(f"RL training: Enabled (interval: {self.rl_train_interval} steps)")
         self.logger.info(f"{'='*60}\n")
         
-        # Generate RL metrics visualizations if RL is enabled
+        # Generate RL metrics visualizations (for both RL and baseline)
+        # Even if use_rl=False, we still generate visualizations if metrics were recorded
         self.logger.info(f"Checking RL visualization conditions...")
         self.logger.info(f"  rl_enabled: {self.rl_enabled}")
         self.logger.info(f"  rl_collector exists: {self.game.rl_collector is not None}")
         if self.game.rl_collector:
             self.logger.info(f"  metrics_recorder exists: {self.game.rl_collector.metrics_recorder is not None}")
         
-        if self.rl_enabled and self.game.rl_collector and self.game.rl_collector.metrics_recorder:
+        # Generate visualizations if collector exists (for both RL and baseline)
+        if self.game.rl_collector and self.game.rl_collector.metrics_recorder:
             try:
                 self.logger.info("Generating RL metrics visualizations...")
                 from modules.rl.visualizer import RLMetricsVisualizer
@@ -268,96 +262,45 @@ class SimulateServer:
                     self.logger.info("  - reward_components.png")
                     self.logger.info("  - reward_distribution.png")
                     self.logger.info("  - action_distribution.png")
+                    if self.rl_enabled:
+                        self.logger.info("  - learning_curves.png")
+                        self.logger.info("  - training_losses.png")
                     self.logger.info("  - rl_summary.txt")
                 
             except Exception as e:
                 self.logger.warning(f"Failed to generate RL visualizations: {e}")
                 import traceback
                 self.logger.warning(traceback.format_exc())
-        elif self.rl_enabled:
-            self.logger.warning("RL is enabled but metrics recorder is not available")
-            if not self.game.rl_collector:
-                self.logger.warning("  - RL collector is None")
-            elif not self.game.rl_collector.metrics_recorder:
-                self.logger.warning("  - Metrics recorder is None")
-    
-    def _rl_train_step(self, step):
-        """
-        Perform one RL training step
-        
-        Args:
-            step: Current simulation step
-        """
-        if not self.rl_enabled or not self.game.rl_collector:
-            return
-        
-        try:
-            train_start_time = time.time()
-            
-            # Get collected rollouts
-            rollouts = self.game.rl_collector.flush_all_buffers()
-            
-            if not rollouts:
-                return
-            
-            # Check if we have enough data
-            total_transitions = sum(len(r) for r in rollouts.values())
-            if total_transitions == 0:
-                return
-            
-            # Show training progress
-            if TQDM_AVAILABLE:
-                print(f"\n🔄 RL Training at step {step}: {total_transitions} transitions")
+        else:
+            if self.rl_enabled:
+                self.logger.warning("RL is enabled but metrics recorder is not available")
+                if not self.game.rl_collector:
+                    self.logger.warning("  - RL collector is None")
+                elif not self.game.rl_collector.metrics_recorder:
+                    self.logger.warning("  - Metrics recorder is None")
             else:
-                self.logger.info(
-                    f"RL Training at step {step}: {total_transitions} transitions collected"
-                )
-            
-            # Train on collected data
-            self.rl_trainer.train_step(rollouts)
-            
-            # Record training metrics
-            if self.game.rl_collector and self.game.rl_collector.metrics_recorder:
-                # Update training step first
-                self.game.rl_collector.metrics_recorder.training_step = step
-                
-                # Calculate agent rewards from rollouts
-                agent_rewards = {}
-                agent_components = {}
-                for agent_name, agent_rollout in rollouts.items():
-                    if agent_rollout:
-                        # Sum rewards for this training step
-                        total_reward = sum(step.get("reward", 0.0) for step in agent_rollout)
-                        agent_rewards[agent_name] = total_reward
+                # Baseline mode: still try to save metrics if collector exists
+                if self.game.rl_collector and self.game.rl_collector.metrics_recorder:
+                    try:
+                        # Ensure checkpoints_folder is set
+                        if not self.game.rl_collector.metrics_recorder.checkpoints_folder:
+                            self.game.rl_collector.metrics_recorder.checkpoints_folder = self.checkpoints_folder
                         
-                        # Extract components from transitions (if available)
-                        # Note: components might not be in rollout, so we'll use what we have
-                        agent_components[agent_name] = {}
-                
-                # Record training step metrics
-                self.game.rl_collector.metrics_recorder.record_training_step(
-                    step, agent_rewards, agent_components
-                )
-            
-            train_time = time.time() - train_start_time
-            
-            # Save models periodically
-            if step % (self.rl_train_interval * 10) == 0:
-                save_start_time = time.time()
-                model_path = os.path.join(self.checkpoints_folder, "rl_models", f"step_{step}")
-                os.makedirs(model_path, exist_ok=True)
-                self.rl_trainer.save_models(model_path)
-                save_time = time.time() - save_start_time
-                if TQDM_AVAILABLE:
-                    print(f"💾 Models saved to {model_path} (took {save_time:.2f}s)")
-                else:
-                    self.logger.info(f"RL models saved to {model_path} (took {save_time:.2f}s)")
-            
-            if TQDM_AVAILABLE:
-                print(f"✅ Training completed in {train_time:.2f}s\n")
-        
-        except Exception as e:
-            self.logger.warning(f"RL training failed at step {step}: {e}")
+                        # Save metrics
+                        metrics_file = self.game.rl_collector.metrics_recorder.save_metrics()
+                        if metrics_file:
+                            self.logger.info(f"Baseline metrics saved to: {metrics_file}")
+                            
+                            # Generate visualizations for baseline
+                            from modules.rl.visualizer import RLMetricsVisualizer
+                            viz_dir = os.path.join(self.checkpoints_folder, "rl_visualizations")
+                            os.makedirs(viz_dir, exist_ok=True)
+                            visualizer = RLMetricsVisualizer(metrics_file, viz_dir)
+                            visualizer.generate_all_visualizations()
+                            self.logger.info(f"Baseline visualizations saved to: {viz_dir}")
+                    except Exception as e:
+                        self.logger.warning(f"Failed to save baseline metrics: {e}")
+    
 
     def load_static(self, path):
         return utils.load_dict(os.path.join(self.static_root, path))

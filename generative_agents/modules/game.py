@@ -36,26 +36,53 @@ class Game:
             agent_config["storage_root"] = os.path.join(storage_root, name)
             self.agents[name] = Agent(agent_config, self.maze, self.conversation, self.logger)
         
-        # Initialize RL Data Collector if RL is enabled
+        # Store RL config for later use
+        self._rl_config = config.get("rl", {})
+        
+        # Initialize RL Data Collector for metrics recording
+        # Even if use_rl=False, we still initialize collector to record metrics for baseline comparison
         checkpoints_folder = os.path.join(f"results/checkpoints/{name}")
-        if config.get("use_rl", False):
+        use_rl = config.get("use_rl", False)
+        
+        try:
+            from modules.rl.data_collector import OnlineDataCollector
+            rl_config = config.get("rl", {})
+            collector_config = rl_config.get("collector", {})
+            collector_config["checkpoints_folder"] = checkpoints_folder
+            # Pass metrics config to collector
+            collector_config["metrics"] = rl_config.get("metrics", {})
+            collector_config["metrics"]["checkpoints_folder"] = checkpoints_folder
+            # Mark if this is metrics-only mode (no training)
+            collector_config["metrics_only"] = not use_rl
+            self.rl_collector = OnlineDataCollector(collector_config)
+            if use_rl:
+                self.logger.info("RL Data Collector initialized (with training)")
+            else:
+                self.logger.info("RL Data Collector initialized (metrics only, no training)")
+        except Exception as e:
+            self.logger.warning(f"Failed to initialize RL Data Collector: {e}")
+            import traceback
+            self.logger.warning(traceback.format_exc())
+            self.rl_collector = None
+        
+        # Initialize MAPPO Trainer if RL is enabled
+        self.rl_trainer = None
+        if use_rl:
             try:
-                from modules.rl.data_collector import OnlineDataCollector
-                rl_config = config.get("rl", {})
-                collector_config = rl_config.get("collector", {})
-                collector_config["checkpoints_folder"] = checkpoints_folder
-                # Pass metrics config to collector
-                collector_config["metrics"] = rl_config.get("metrics", {})
-                collector_config["metrics"]["checkpoints_folder"] = checkpoints_folder
-                self.rl_collector = OnlineDataCollector(collector_config)
-                self.logger.info("RL Data Collector initialized")
+                from modules.rl.mappo import MAPPOTrainer
+                trainer_config = rl_config.get("trainer", {})
+                # Get metrics_recorder from collector
+                metrics_recorder = self.rl_collector.metrics_recorder if self.rl_collector else None
+                self.rl_trainer = MAPPOTrainer(
+                    config=trainer_config,
+                    metrics_recorder=metrics_recorder
+                )
+                self.logger.info("MAPPO Trainer initialized")
             except Exception as e:
-                self.logger.warning(f"Failed to initialize RL Data Collector: {e}")
+                self.logger.warning(f"Failed to initialize MAPPO Trainer: {e}")
                 import traceback
                 self.logger.warning(traceback.format_exc())
-                self.rl_collector = None
-        else:
-            self.rl_collector = None
+                self.rl_trainer = None
 
     def get_agent(self, name):
         return self.agents[name]
@@ -89,6 +116,42 @@ class Game:
         )
         self.logger.info("\n{}\n{}\n".format(utils.split_line(title), agent))
         return {"plan": plan, "info": info}
+    
+    def rl_train_step(self, step: int, save_models_interval: int = 10):
+        """
+        Perform one RL training step
+        
+        This should be called at training intervals (e.g., every rl_train_interval steps)
+        
+        Args:
+            step: Current simulation step
+            save_models_interval: Save models every N training steps (default: 10)
+        """
+        if not self.rl_trainer or not self.rl_collector:
+            return
+        
+        # Flush buffers to get collected rollouts
+        rollouts = self.rl_collector.flush_all_buffers()
+        
+        if not rollouts or not any(len(r) > 0 for r in rollouts.values()):
+            self.logger.info(f"Step {step}: No rollouts to train on")
+            return
+        
+        # Train on collected data
+        total_transitions = sum(len(r) for r in rollouts.values())
+        self.logger.info(f"Step {step}: Training on {total_transitions} transitions")
+        self.rl_trainer.train_step(rollouts, step=step)
+        
+        # Save models periodically
+        rl_config = getattr(self, '_rl_config', {})
+        rl_train_interval = rl_config.get("rl_train_interval", 10)
+        training_step_count = step // rl_train_interval
+        
+        if training_step_count > 0 and training_step_count % save_models_interval == 0:
+            checkpoints_folder = os.path.join(f"results/checkpoints/{self.name}")
+            save_dir = os.path.join(checkpoints_folder, "rl_models", f"step_{step}")
+            self.rl_trainer.save_models(save_dir)
+            self.logger.info(f"Models saved to {save_dir}")
 
     def load_static(self, path):
         return utils.load_dict(os.path.join(self.static_root, path))

@@ -48,6 +48,33 @@ class RLMetricsRecorder:
         # Training step counter
         self.training_step = 0
         
+        # Episode returns: {agent_name: [(episode, return, step), ...]}
+        # Episode is defined as a sequence of steps between training intervals
+        self.episode_returns = defaultdict(list)
+        
+        # Current episode return accumulator
+        self.current_episode_returns = defaultdict(float)
+        self.current_episode_steps = defaultdict(int)
+        
+        # Training losses: {agent_name: [(step, policy_loss, value_loss, entropy), ...]}
+        self.training_losses = defaultdict(list)
+        
+        # Additional training metrics for advanced visualizations
+        # Value estimates: {agent_name: [(step, mean_value, std_value), ...]}
+        self.value_estimates = defaultdict(list)
+        
+        # Advantage estimates: {agent_name: [(step, mean_advantage, std_advantage), ...]}
+        self.advantage_estimates = defaultdict(list)
+        
+        # KL divergence: {agent_name: [(step, kl_divergence), ...]}
+        self.kl_divergences = defaultdict(list)
+        
+        # Gradient norms: {agent_name: [(step, policy_grad_norm, value_grad_norm), ...]}
+        self.gradient_norms = defaultdict(list)
+        
+        # Policy ratios: {agent_name: [(step, mean_ratio, std_ratio, clip_fraction), ...]}
+        self.policy_ratios = defaultdict(list)
+        
         # Enable/disable recording
         self.enabled = True
     
@@ -92,6 +119,10 @@ class RLMetricsRecorder:
         
         # Update current episode reward
         self.current_episode_rewards[agent_name] += reward
+        
+        # Update current episode return (cumulative reward)
+        self.current_episode_returns[agent_name] += reward
+        self.current_episode_steps[agent_name] += 1
     
     def record_action(self, agent_name: str, action_type: str):
         """
@@ -173,8 +204,125 @@ class RLMetricsRecorder:
                 "reward": episode_reward
             })
         
-        # Reset episode rewards
+        # Record episode return (cumulative reward)
+        for agent_name, episode_return in self.current_episode_returns.items():
+            if episode_return != 0 or self.current_episode_steps[agent_name] > 0:
+                episode_num = len(self.episode_returns[agent_name])
+                self.episode_returns[agent_name].append({
+                    "episode": episode_num,
+                    "return": episode_return,
+                    "step": step,
+                    "steps_in_episode": self.current_episode_steps[agent_name]
+                })
+        
+        # Reset episode rewards and returns
         self.current_episode_rewards = defaultdict(float)
+        self.current_episode_returns = defaultdict(float)
+        self.current_episode_steps = defaultdict(int)
+    
+    def record_training_loss(
+        self,
+        agent_name: str,
+        step: int,
+        policy_loss: float,
+        value_loss: float,
+        entropy: float = None
+    ):
+        """
+        Record training loss for an agent
+        
+        Args:
+            agent_name: Name of the agent
+            step: Training step number
+            policy_loss: Policy loss value
+            value_loss: Value loss value
+            entropy: Policy entropy (optional)
+        """
+        if not self.enabled:
+            return
+        
+        self.training_losses[agent_name].append({
+            "step": step,
+            "policy_loss": float(policy_loss),
+            "value_loss": float(value_loss),
+            "entropy": float(entropy) if entropy is not None else None,
+            "timestamp": time.time()
+        })
+    
+    def record_training_metrics(
+        self,
+        agent_name: str,
+        step: int,
+        mean_value: float = None,
+        std_value: float = None,
+        mean_advantage: float = None,
+        std_advantage: float = None,
+        kl_divergence: float = None,
+        policy_grad_norm: float = None,
+        value_grad_norm: float = None,
+        mean_ratio: float = None,
+        std_ratio: float = None,
+        clip_fraction: float = None
+    ):
+        """
+        Record additional training metrics for advanced visualizations
+        
+        Args:
+            agent_name: Name of the agent
+            step: Training step number
+            mean_value: Mean value estimate
+            std_value: Std of value estimates
+            mean_advantage: Mean advantage estimate
+            std_advantage: Std of advantage estimates
+            kl_divergence: KL divergence between old and new policy
+            policy_grad_norm: Policy gradient norm
+            value_grad_norm: Value gradient norm
+            mean_ratio: Mean policy ratio (exp(log_prob_new - log_prob_old))
+            std_ratio: Std of policy ratios
+            clip_fraction: Fraction of ratios that were clipped
+        """
+        if not self.enabled:
+            return
+        
+        if mean_value is not None or std_value is not None:
+            self.value_estimates[agent_name].append({
+                "step": step,
+                "mean_value": float(mean_value) if mean_value is not None else 0.0,
+                "std_value": float(std_value) if std_value is not None else 0.0,
+                "timestamp": time.time()
+            })
+        
+        if mean_advantage is not None or std_advantage is not None:
+            self.advantage_estimates[agent_name].append({
+                "step": step,
+                "mean_advantage": float(mean_advantage) if mean_advantage is not None else 0.0,
+                "std_advantage": float(std_advantage) if std_advantage is not None else 0.0,
+                "timestamp": time.time()
+            })
+        
+        if kl_divergence is not None:
+            self.kl_divergences[agent_name].append({
+                "step": step,
+                "kl_divergence": float(kl_divergence),
+                "timestamp": time.time()
+            })
+        
+        if policy_grad_norm is not None or value_grad_norm is not None:
+            self.gradient_norms[agent_name].append({
+                "step": step,
+                "policy_grad_norm": float(policy_grad_norm) if policy_grad_norm is not None else 0.0,
+                "value_grad_norm": float(value_grad_norm) if value_grad_norm is not None else 0.0,
+                "timestamp": time.time()
+            })
+        
+        if mean_ratio is not None or std_ratio is not None or clip_fraction is not None:
+            self.policy_ratios[agent_name].append({
+                "step": step,
+                "mean_ratio": float(mean_ratio) if mean_ratio is not None else 1.0,
+                "std_ratio": float(std_ratio) if std_ratio is not None else 0.0,
+                "clip_fraction": float(clip_fraction) if clip_fraction is not None else 0.0,
+                "timestamp": time.time()
+            })
     
     def get_summary(self) -> Dict:
         """
@@ -219,6 +367,13 @@ class RLMetricsRecorder:
         Args:
             filepath: Path to save metrics (optional)
         """
+        # End the final episode before saving (for both RL and baseline)
+        # This ensures the last episode is recorded even if it doesn't align with intervals
+        if self.current_episode_returns and any(v > 0 or self.current_episode_steps.get(k, 0) > 0 
+                                                for k, v in self.current_episode_returns.items()):
+            final_step = self.training_step if hasattr(self, 'training_step') else 0
+            self.end_episode(final_step)
+        
         if not filepath:
             if not self.checkpoints_folder:
                 print(f"Warning: checkpoints_folder is empty, cannot save metrics")
@@ -237,6 +392,27 @@ class RLMetricsRecorder:
             "training_stats": self.training_stats,
             "episode_rewards": {
                 agent: episodes for agent, episodes in self.episode_rewards.items()
+            },
+            "episode_returns": {
+                agent: returns for agent, returns in self.episode_returns.items()
+            },
+            "training_losses": {
+                agent: losses for agent, losses in self.training_losses.items()
+            },
+            "value_estimates": {
+                agent: estimates for agent, estimates in self.value_estimates.items()
+            },
+            "advantage_estimates": {
+                agent: estimates for agent, estimates in self.advantage_estimates.items()
+            },
+            "kl_divergences": {
+                agent: kls for agent, kls in self.kl_divergences.items()
+            },
+            "gradient_norms": {
+                agent: norms for agent, norms in self.gradient_norms.items()
+            },
+            "policy_ratios": {
+                agent: ratios for agent, ratios in self.policy_ratios.items()
             },
             "reward_components": {
                 agent: {
@@ -273,6 +449,13 @@ class RLMetricsRecorder:
         self.reward_history = defaultdict(list, data.get("reward_history", {}))
         self.training_stats = data.get("training_stats", {})
         self.episode_rewards = defaultdict(list, data.get("episode_rewards", {}))
+        self.episode_returns = defaultdict(list, data.get("episode_returns", {}))
+        self.training_losses = defaultdict(list, data.get("training_losses", {}))
+        self.value_estimates = defaultdict(list, data.get("value_estimates", {}))
+        self.advantage_estimates = defaultdict(list, data.get("advantage_estimates", {}))
+        self.kl_divergences = defaultdict(list, data.get("kl_divergences", {}))
+        self.gradient_norms = defaultdict(list, data.get("gradient_norms", {}))
+        self.policy_ratios = defaultdict(list, data.get("policy_ratios", {}))
         self.reward_components = defaultdict(
             lambda: defaultdict(list),
             {

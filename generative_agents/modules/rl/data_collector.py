@@ -44,6 +44,14 @@ class OnlineDataCollector:
         # Enable/disable collection
         self.enabled = True
         
+        # Metrics-only mode: if True, only record metrics, don't collect rollouts for training
+        self.metrics_only = self.config.get("metrics_only", False)
+        
+        # Episode interval for baseline (metrics-only mode): end episode every N steps
+        # This allows baseline experiments to have episode returns for comparison
+        # Default: every 10 steps (similar to typical rl_train_interval)
+        self.episode_interval = self.config.get("episode_interval", 10)
+        
         # Maximum buffer size before flushing
         self.max_buffer_size = self.config.get("max_buffer_size", 1000)
         
@@ -221,23 +229,31 @@ class OnlineDataCollector:
             agent_name, reward, components, step=current_step
         )
         
-        # Store transition
-        transition = {
-            "state": self.previous_states[agent_name],
-            "action": action_dict["action_id"],
-            "action_dict": action_dict,
-            "action_log_prob": action_dict.get("action_log_prob"),
-            "value": action_dict.get("value"),
-            "reward": reward,
-            "next_state": next_state,
-            "done": done,
-        }
-        
-        self.rollout_buffers[agent_name].append(transition)
+        # Store transition only if not in metrics-only mode (baseline experiments don't need rollouts)
+        if not self.metrics_only:
+            transition = {
+                "state": self.previous_states[agent_name],
+                "action": action_dict["action_id"],
+                "action_dict": action_dict,
+                "action_log_prob": action_dict.get("action_log_prob"),
+                "value": action_dict.get("value"),
+                "reward": reward,
+                "next_state": next_state,
+                "done": done,
+            }
+            self.rollout_buffers[agent_name].append(transition)
         
         # Update previous state
         self.previous_states[agent_name] = next_state
         self.current_actions.pop(agent_name, None)
+        
+        # In metrics-only mode (baseline), end episode at fixed intervals
+        # This allows baseline experiments to have episode returns for comparison
+        if self.metrics_only:
+            current_step = self.metrics_recorder.training_step if hasattr(self.metrics_recorder, 'training_step') else 0
+            # End episode every episode_interval steps (similar to training intervals in RL mode)
+            if current_step > 0 and current_step % self.episode_interval == 0:
+                self.metrics_recorder.end_episode(current_step)
         
         # Flush buffer if it's too large
         if len(self.rollout_buffers[agent_name]) >= self.max_buffer_size:
@@ -294,15 +310,17 @@ class OnlineDataCollector:
             current_step = self.metrics_recorder.training_step if hasattr(self.metrics_recorder, 'training_step') else 0
             self.metrics_recorder.record_reward(agent1_name, reward, components, step=current_step)
             
-            transition = {
-                "state": self.previous_states[agent1_name],
-                "action": int(ActionType.INITIATE_CHAT),
-                "action_dict": action_dict,
-                "reward": reward,
-                "next_state": next_state,
-                "done": False,
-            }
-            self.rollout_buffers[agent1_name].append(transition)
+            # Store transition only if not in metrics-only mode
+            if not self.metrics_only:
+                transition = {
+                    "state": self.previous_states[agent1_name],
+                    "action": int(ActionType.INITIATE_CHAT),
+                    "action_dict": action_dict,
+                    "reward": reward,
+                    "next_state": next_state,
+                    "done": False,
+                }
+                self.rollout_buffers[agent1_name].append(transition)
             self.previous_states[agent1_name] = next_state
         
         # For agent2 (responder) - similar but with different action type
@@ -326,15 +344,17 @@ class OnlineDataCollector:
             current_step = self.metrics_recorder.training_step if hasattr(self.metrics_recorder, 'training_step') else 0
             self.metrics_recorder.record_reward(agent2_name, reward, components, step=current_step)
             
-            transition = {
-                "state": self.previous_states[agent2_name],
-                "action": int(ActionType.CONTINUE),
-                "action_dict": action_dict,
-                "reward": reward,
-                "next_state": next_state,
-                "done": False,
-            }
-            self.rollout_buffers[agent2_name].append(transition)
+            # Store transition only if not in metrics-only mode
+            if not self.metrics_only:
+                transition = {
+                    "state": self.previous_states[agent2_name],
+                    "action": int(ActionType.CONTINUE),
+                    "action_dict": action_dict,
+                    "reward": reward,
+                    "next_state": next_state,
+                    "done": False,
+                }
+                self.rollout_buffers[agent2_name].append(transition)
             self.previous_states[agent2_name] = next_state
     
     def _map_llm_action_to_rl(self, action_type: str, details: Dict = None) -> ActionType:
@@ -397,9 +417,19 @@ class OnlineDataCollector:
         """
         Flush all buffers and return all collected data
         
+        This is typically called at training intervals to:
+        1. Get all collected rollouts for training
+        2. End current episode and record episode returns
+        
         Returns:
             Dictionary of all rollouts
         """
+        # End current episode before flushing (episode = sequence between training intervals)
+        # This is only for RL mode; baseline mode uses update_step() to end episodes
+        if not self.metrics_only:
+            current_step = self.metrics_recorder.training_step if hasattr(self.metrics_recorder, 'training_step') else 0
+            self.metrics_recorder.end_episode(current_step)
+        
         all_rollouts = dict(self.rollout_buffers)
         self.rollout_buffers.clear()
         self.previous_states.clear()
